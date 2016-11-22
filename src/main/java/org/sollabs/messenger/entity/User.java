@@ -38,6 +38,9 @@ public class User {
 
 	@Column
 	private String comment;
+	
+	@Column
+	private short signinFailure;
 
 	@OneToMany(fetch = FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinColumn(name = "userId")
@@ -81,6 +84,14 @@ public class User {
 
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+	
+	public short getSigninFailure() {
+		return signinFailure;
+	}
+
+	public void setSigninFailure(short signinFailure) {
+		this.signinFailure = signinFailure;
 	}
 
 	public Collection<Friend> getMyFriends() {
