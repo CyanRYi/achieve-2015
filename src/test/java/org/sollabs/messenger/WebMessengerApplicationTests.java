@@ -12,5 +12,4 @@ public class WebMessengerApplicationTests {
 	@Test
 	public void contextLoads() {
 	}
-
 }

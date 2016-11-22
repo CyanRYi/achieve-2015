@@ -1,6 +1,8 @@
 package org.sollabs.messenger.entity;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.function.Predicate;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -9,11 +11,16 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 @Entity
 public class User {
+	
+	public User() {}
+	
+	public User(long id) {
+		this.id = id;
+	}
 
 	@Id
 	@GeneratedValue
@@ -32,17 +39,9 @@ public class User {
 	@Column
 	private String comment;
 
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinTable(name = "FRIEND", 
-		joinColumns = {@JoinColumn(name = "ID", nullable = false, updatable = false)}, 
-		inverseJoinColumns = {@JoinColumn(name = "friendId", nullable = false, updatable = false)})
-	private Set<User> friends;
-	
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinTable(name = "BANNED", 
-		joinColumns = {@JoinColumn(name = "ID", nullable = false, updatable = false)}, 
-		inverseJoinColumns = {@JoinColumn(name = "bannedId", nullable = false, updatable = false)})
-	private Set<User> banned;
+	@OneToMany(fetch = FetchType.LAZY, cascade=CascadeType.ALL)
+	@JoinColumn(name = "userId")
+	private Collection<Friend> myFriends;
 
 	public long getId() {
 		return id;
@@ -84,19 +83,28 @@ public class User {
 		this.comment = comment;
 	}
 
-	public Set<User> getFriends() {
-		return friends;
+	public Collection<Friend> getMyFriends() {
+		return myFriends;
 	}
 
-	public void setFriends(Set<User> friends) {
-		this.friends = friends;
+	public void setMyFriends(Collection<Friend> myFriends) {
+		this.myFriends = myFriends;
 	}
 
-	public Set<User> getBanned() {
-		return banned;
+	public void addFriend(Friend friend) {
+		if (this.myFriends == null) {
+			this.myFriends = new ArrayList<Friend>();
+		}
+		
+		myFriends.add(friend);
 	}
-
-	public void setBanned(Set<User> banned) {
-		this.banned = banned;
+	
+	public void removeFriend(long friendId) {
+		this.getMyFriends().removeIf(new Predicate<Friend>() {
+			@Override
+			public boolean test(Friend t) {
+				return (t.getId() == friendId);
+			}
+		});
 	}
 }
