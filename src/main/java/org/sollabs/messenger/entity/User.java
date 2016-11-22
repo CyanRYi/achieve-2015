@@ -107,7 +107,9 @@ public class User {
 			this.myFriends = new ArrayList<Friend>();
 		}
 		
-		myFriends.add(friend);
+		if (!this.getMyFriends().contains(friend)) {
+			myFriends.add(friend);
+		}
 	}
 	
 	public void removeFriend(long friendId) {

@@ -2,6 +2,7 @@ package org.sollabs.messenger.controller;
 
 import java.util.Collection;
 
+import org.sollabs.messenger.config.security.SystemAuthentication;
 import org.sollabs.messenger.entity.Friend;
 import org.sollabs.messenger.entity.User;
 import org.sollabs.messenger.repository.UserRepository;
@@ -21,20 +22,20 @@ public class FriendController {
 	private UserRepository userRepo;
 
 	@GetMapping
-	public Collection<Friend> getFriends() {
-		User me = userRepo.findOne(1L);
+	public Collection<Friend> getFriends(SystemAuthentication auth) {
+		User me = userRepo.findOne(auth.getUserId());
 		
 		return me.getMyFriends();
 	}
 	
 	@PostMapping
-	public Collection<Friend> addFriends(@RequestBody User friend) {
+	public Collection<Friend> addFriends(@RequestBody User friend, SystemAuthentication auth) {
 		
-		User me = userRepo.findOne(1L);
+		User me = userRepo.findOne(auth.getUserId());
 
 		if (userRepo.exists(friend.getId())) {
 
-			me.addFriend(new Friend(1L, friend.getId()));
+			me.addFriend(new Friend(auth.getUserId(), friend.getId()));
 
 			me = userRepo.save(me);
 		}
@@ -43,9 +44,9 @@ public class FriendController {
 	}
 
 	@DeleteMapping
-	public Collection<Friend> removeFriends(@RequestBody User friend) {
+	public Collection<Friend> removeFriends(@RequestBody User friend, SystemAuthentication auth) {
 
-		User me = userRepo.findOne(1L);
+		User me = userRepo.findOne(auth.getUserId());
 		
 		if (userRepo.exists(friend.getId())) {
 			
