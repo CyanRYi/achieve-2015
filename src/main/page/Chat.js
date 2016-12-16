@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Panel, Navbar } from 'react-bootstrap';
 
 import Ajax from '../component/Ajax.js';
 import WebSocketClient from '../component/WebSocketClient.js';
@@ -124,20 +123,20 @@ export default class Chat extends React.Component {
 
 	render() {
 		return (
-			<div>
-				<Navbar fixedTop>
+			<div style={{height:"85%"}}>
+				<div container={this}>
 					<ChatHeader state={this.state.readyState} handleClose={this.closeChat} />
-				</Navbar>
-				<div style={{maxHeight:"500px"}}>
+				</div>
+				<div style={{height:"90%", overflow:"auto"}}>
 					{this.state.data.map((obj, i) => {
 						let myMessage = obj.sendedBy == userId;
 						return (<Message isMine={myMessage} content={obj.content} key={i}
 							name={this.state.members.filter(m => m.id == obj.sendedBy)[0].name} />);
 					})}
 				</div>
-				<Navbar fixedBottom>
+				<div container={this}>
 					<ChatFooter onSubmit={this.handleSubmit} />
-				</Navbar>
+				</div>
 			</div>
 		);
 	}

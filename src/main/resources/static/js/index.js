@@ -48043,8 +48043,6 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _reactBootstrap = __webpack_require__(248);
-
 	var _Ajax = __webpack_require__(505);
 
 	var _Ajax2 = _interopRequireDefault(_Ajax);
@@ -48053,15 +48051,15 @@
 
 	var _WebSocketClient2 = _interopRequireDefault(_WebSocketClient);
 
-	var _ChatHeader = __webpack_require__(509);
+	var _ChatHeader = __webpack_require__(562);
 
 	var _ChatHeader2 = _interopRequireDefault(_ChatHeader);
 
-	var _ChatFooter = __webpack_require__(510);
+	var _ChatFooter = __webpack_require__(563);
 
 	var _ChatFooter2 = _interopRequireDefault(_ChatFooter);
 
-	var _Message = __webpack_require__(511);
+	var _Message = __webpack_require__(564);
 
 	var _Message2 = _interopRequireDefault(_Message);
 
@@ -48208,15 +48206,15 @@
 
 				return _react2.default.createElement(
 					'div',
-					null,
+					{ style: { height: "85%" } },
 					_react2.default.createElement(
-						_reactBootstrap.Navbar,
-						{ fixedTop: true },
+						'div',
+						{ container: this },
 						_react2.default.createElement(_ChatHeader2.default, { state: this.state.readyState, handleClose: this.closeChat })
 					),
 					_react2.default.createElement(
 						'div',
-						{ style: { maxHeight: "500px" } },
+						{ style: { height: "90%", overflow: "auto" } },
 						this.state.data.map(function (obj, i) {
 							var myMessage = obj.sendedBy == userId;
 							return _react2.default.createElement(_Message2.default, { isMine: myMessage, content: obj.content, key: i,
@@ -48226,8 +48224,8 @@
 						})
 					),
 					_react2.default.createElement(
-						_reactBootstrap.Navbar,
-						{ fixedBottom: true },
+						'div',
+						{ container: this },
 						_react2.default.createElement(_ChatFooter2.default, { onSubmit: this.handleSubmit })
 					)
 				);
@@ -48240,7 +48238,60 @@
 	exports.default = Chat;
 
 /***/ },
-/* 509 */
+/* 509 */,
+/* 510 */,
+/* 511 */,
+/* 512 */,
+/* 513 */,
+/* 514 */,
+/* 515 */,
+/* 516 */,
+/* 517 */,
+/* 518 */,
+/* 519 */,
+/* 520 */,
+/* 521 */,
+/* 522 */,
+/* 523 */,
+/* 524 */,
+/* 525 */,
+/* 526 */,
+/* 527 */,
+/* 528 */,
+/* 529 */,
+/* 530 */,
+/* 531 */,
+/* 532 */,
+/* 533 */,
+/* 534 */,
+/* 535 */,
+/* 536 */,
+/* 537 */,
+/* 538 */,
+/* 539 */,
+/* 540 */,
+/* 541 */,
+/* 542 */,
+/* 543 */,
+/* 544 */,
+/* 545 */,
+/* 546 */,
+/* 547 */,
+/* 548 */,
+/* 549 */,
+/* 550 */,
+/* 551 */,
+/* 552 */,
+/* 553 */,
+/* 554 */,
+/* 555 */,
+/* 556 */,
+/* 557 */,
+/* 558 */,
+/* 559 */,
+/* 560 */,
+/* 561 */,
+/* 562 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -48315,7 +48366,7 @@
 	exports.default = ChatHeader;
 
 /***/ },
-/* 510 */
+/* 563 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -48410,7 +48461,7 @@
 	exports.default = ChatFooter;
 
 /***/ },
-/* 511 */
+/* 564 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
