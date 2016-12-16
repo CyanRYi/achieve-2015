@@ -15,6 +15,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
 		registry.addResourceHandler("/css/**").addResourceLocations("classpath:/static/css/");
 		registry.addResourceHandler("/js/**").addResourceLocations("classpath:/static/js/");
+		//registry.addResourceHandler("/fonts/glyphicons**").addResourceLocations("classpath:/META-INF/resources/webjars/bootstrap/3.3.7/fonts/");
 		registry.addResourceHandler("/fonts/**").addResourceLocations("classpath:/static/fonts/");
 		registry.addResourceHandler("/images/**").addResourceLocations("classpath:/static/images/");
 	}
@@ -22,6 +23,8 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
 		registry.addViewController("/").setViewName("index");
-		registry.addViewController("/signin").setViewName("signin");
+		registry.addViewController("/view/signin").setViewName("signin");
+		registry.addViewController("/view/friend").setViewName("friend");
+		registry.addViewController("/view/room").setViewName("room");
 	}
 }

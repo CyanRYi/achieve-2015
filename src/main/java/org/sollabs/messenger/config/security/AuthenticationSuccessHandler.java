@@ -37,6 +37,10 @@ public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccess
 		
 		userRepo.save(signinAccount);
 		
+		
+		// 1. 소속된 방의 정보를 통해 세션 접속		signinAccount.getChannels()
+		// 2. 미수신된 모든 메시지 수신 
+		
 		super.onAuthenticationSuccess(req, resp, auth);
 	}
 

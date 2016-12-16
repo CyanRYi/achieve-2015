@@ -1,12 +1,16 @@
 package org.sollabs.messenger.controller;
 
-import java.util.Collection;
+import java.util.HashMap;
 
 import org.sollabs.messenger.config.security.SystemAuthentication;
 import org.sollabs.messenger.entity.Friend;
 import org.sollabs.messenger.entity.User;
-import org.sollabs.messenger.repository.UserRepository;
+import org.sollabs.messenger.service.FriendService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,42 +23,28 @@ import org.springframework.web.bind.annotation.RestController;
 public class FriendController {
 
 	@Autowired
-	private UserRepository userRepo;
-
+	private FriendService friendService;
+	
 	@GetMapping
-	public Collection<Friend> getFriends(SystemAuthentication auth) {
-		User me = userRepo.findOne(auth.getUserId());
-		
-		return me.getMyFriends();
+	public Page<Friend> getFriends(SystemAuthentication auth, Pageable page) {
+		return friendService.getFriends(auth.getUserId(), page);
 	}
 	
 	@PostMapping
-	public Collection<Friend> addFriends(@RequestBody User friend, SystemAuthentication auth) {
-		
-		User me = userRepo.findOne(auth.getUserId());
-
-		if (userRepo.exists(friend.getId())) {
-
-			me.addFriend(new Friend(auth.getUserId(), friend.getId()));
-
-			me = userRepo.save(me);
-		}
-        
-        return me.getMyFriends();
+	public User addFriends(@RequestBody User friend, SystemAuthentication auth) {
+        return friendService.addFriend(auth.getUserId(), friend.getId());
 	}
 
 	@DeleteMapping
-	public Collection<Friend> removeFriends(@RequestBody User friend, SystemAuthentication auth) {
-
-		User me = userRepo.findOne(auth.getUserId());
+	public ResponseEntity<User> removeFriends(@RequestBody User friend, SystemAuthentication auth) {
 		
-		if (userRepo.exists(friend.getId())) {
-			
-			me.removeFriend(friend.getId());
-			
-			userRepo.save(me);
-		}
+		friendService.removeFriend(auth.getUserId(), friend.getId());
 		
-		return me.getMyFriends();
+		return new ResponseEntity<User>(friend, HttpStatus.OK); 
+	}
+	
+	@PostMapping("/search")
+	public Page<User> searchUser(Pageable page, @RequestBody HashMap<String, Object> searchParam, SystemAuthentication auth) {
+		return friendService.searchFriends(page, searchParam.get("params"), auth.getUserId());
 	}
 }

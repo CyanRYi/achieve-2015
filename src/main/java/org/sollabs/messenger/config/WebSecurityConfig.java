@@ -36,7 +36,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity security) throws Exception {
 		security.authorizeRequests().antMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/h2-console").permitAll();
 		
-		security.authorizeRequests().antMatchers("/signin").anonymous()
+		security.authorizeRequests().antMatchers("/view/signin").anonymous()
 			.anyRequest().authenticated()
 			
 			/* h2-console을 사용하기 위한 보안 우회 설정 */
@@ -44,7 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.and().headers().addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy","script-src 'self'")).frameOptions().disable()
 			/* h2-console을 사용하기 위한 보안 우회 설정 */
 			
-			.and().formLogin().loginPage("/signin").loginProcessingUrl("/sign-in-process")
+			.and().formLogin().loginPage("/view/signin").loginProcessingUrl("/sign-in-process")
 				.successHandler(successHandler).failureHandler(failureHandler)
 			.and().logout()./*logoutUrl("/signout").*/logoutRequestMatcher(new AntPathRequestMatcher("/signout", "GET")).logoutSuccessUrl("/");
 	}

@@ -5,6 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 @Entity
 public class Friend {
 	
@@ -47,5 +49,19 @@ public class Friend {
 
 	public void setFriendId(long friendId) {
 		this.friendId = friendId;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof Friend)) {
+			return false;
+		}
+		return (this.userId == ((Friend)o).getUserId() 
+				&& this.friendId == ((Friend)o).getFriendId());
+	}
+	
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
 	}
 }

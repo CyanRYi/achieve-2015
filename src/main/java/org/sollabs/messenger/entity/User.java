@@ -2,7 +2,6 @@ package org.sollabs.messenger.entity;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.function.Predicate;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -11,7 +10,12 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 public class User {
@@ -31,6 +35,7 @@ public class User {
 	private String email;
 
 	@Column(length = 60)
+	@JsonIgnore
 	private String password;
 
 	@Column(nullable = false)
@@ -42,10 +47,17 @@ public class User {
 	@Column
 	private short signinFailure;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade=CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, orphanRemoval=true, cascade=CascadeType.ALL)
 	@JoinColumn(name = "userId")
 	private Collection<Friend> myFriends;
 
+	@ManyToMany(cascade=CascadeType.ALL)
+	@JsonManagedReference
+	@JoinTable(name = "UserInRoom", 
+		joinColumns = @JoinColumn(name ="userId", referencedColumnName="id"), 
+		inverseJoinColumns = @JoinColumn(name="roomId", referencedColumnName="id"))
+	private Collection<Room> channels;
+	
 	public long getId() {
 		return id;
 	}
@@ -102,6 +114,18 @@ public class User {
 		this.myFriends = myFriends;
 	}
 
+	public void addFriend(long friendId) {
+		if (this.myFriends == null) {
+			this.myFriends = new ArrayList<Friend>();
+		}
+		
+		Friend friend = new Friend(this.id, friendId);
+		
+		if (!this.getMyFriends().contains(friend)) {
+			myFriends.add(friend);
+		}
+	}
+	
 	public void addFriend(Friend friend) {
 		if (this.myFriends == null) {
 			this.myFriends = new ArrayList<Friend>();
@@ -113,11 +137,20 @@ public class User {
 	}
 	
 	public void removeFriend(long friendId) {
-		this.getMyFriends().removeIf(new Predicate<Friend>() {
+		this.getMyFriends().remove(new Friend(this.getId(), friendId));
+		/*this.getMyFriends().removeIf(new Predicate<Friend>() {
 			@Override
 			public boolean test(Friend t) {
-				return (t.getId() == friendId);
+				return (t.getFriendId() == friendId);
 			}
-		});
+		});*/
+	}
+
+	public Collection<Room> getChannels() {
+		return channels;
+	}
+
+	public void setChannels(Collection<Room> channels) {
+		this.channels = channels;
 	}
 }
