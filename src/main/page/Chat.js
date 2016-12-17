@@ -25,7 +25,6 @@ export default class Chat extends React.Component {
 		this.closeChat = this.closeChat.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.connectStateChange = this.connectStateChange.bind(this);
-		this.setMember = this.setMember.bind(this);
 	}
 
 	componentWillMount() {
@@ -84,16 +83,31 @@ export default class Chat extends React.Component {
 	}
 
 	retrieveData(page, params) {
-		this.sendProxyRequest('./messages?page=0&size=10&roomId=' + this.props.roomId, 'GET', this.bindData);
+		var me = this;
+		var roomId = this.props.roomId;
+		const AJAX = new Ajax();
 
-		this.sendProxyRequest('./rooms/members/' + this.props.roomId, 'GET', this.setMember);
-	}
-
-	setMember(response) {
-		this.setState({
-			members : JSON.parse(response)
+		var promiseMember = new Promise(function (resolve, reject) {
+			AJAX.call('./rooms/members/' + roomId, 'GET', resolve, reject);
 		});
+
+		if (roomId) {
+			promiseMember.then(
+				function(response) {
+					let result = JSON.parse(response);
+					me	.setState({
+						members : result
+					});
+				}, function(error) {
+					console.log(error);
+				}
+			).then(AJAX.call('./messages?page=0&size=10&roomId=' + roomId, 'GET', this.bindData, console.log));
+		}
+		else {
+			AJAX.call('./messages?page=0&size=10&roomId=' + roomId, 'GET', this.bindData, reject);
+		}
 	}
+
 
 	bindData(response) {
 		let result = JSON.parse(response);

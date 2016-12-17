@@ -9,11 +9,11 @@ import java.util.UUID;
 import javax.transaction.Transactional;
 
 import org.sollabs.messenger.config.security.SystemAuthentication;
+import org.sollabs.messenger.entity.Account;
 import org.sollabs.messenger.entity.Message;
 import org.sollabs.messenger.entity.Room;
-import org.sollabs.messenger.entity.User;
+import org.sollabs.messenger.repository.AccountRepository;
 import org.sollabs.messenger.repository.MessageRepository;
-import org.sollabs.messenger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class WebSocketSessionManager {
 
 	@Autowired
-	private UserRepository userRepo;
+	private AccountRepository accountRepo;
 	
 	@Autowired
 	private MessageRepository messageRepo;
@@ -38,7 +38,7 @@ public class WebSocketSessionManager {
 	public void addSession(WebSocketSession session) {
 		long userId = ((SystemAuthentication)session.getPrincipal()).getUserId();
 		
-		User sessionInfo = userRepo.findOne(userId);
+		Account sessionInfo = accountRepo.findOne(userId);
 		
 		for(Room channel : sessionInfo.getChannels()) {
 			UUID roomId = channel.getId();
@@ -55,7 +55,7 @@ public class WebSocketSessionManager {
 	public void removeSession(WebSocketSession session) {
 		long userId = ((SystemAuthentication)session.getPrincipal()).getUserId();
 		
-		User sessionInfo = userRepo.findOne(userId);
+		Account sessionInfo = accountRepo.findOne(userId);
 		
 		for(Room channel : sessionInfo.getChannels()) {
 			UUID roomId = channel.getId();

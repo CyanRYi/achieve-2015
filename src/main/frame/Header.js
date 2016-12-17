@@ -37,7 +37,7 @@ export default class Header extends React.Component {
 					</Nav>
 					<Nav pullRight>
 						<NavDropdown title={username} id="personal-nav-menu-dropdown">
-							<LinkContainer to="/#"><MenuItem>개인정보수정</MenuItem></LinkContainer>
+							<LinkContainer to="/myInfo"><MenuItem>개인정보수정</MenuItem></LinkContainer>
 				      <MenuItem href="/signout">로그아웃</MenuItem>
 						</NavDropdown>
 					</Nav>

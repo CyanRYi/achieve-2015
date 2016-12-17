@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.UUID;
 
 import org.sollabs.messenger.config.security.SystemAuthentication;
+import org.sollabs.messenger.entity.Account;
 import org.sollabs.messenger.entity.Room;
-import org.sollabs.messenger.entity.User;
 import org.sollabs.messenger.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -34,7 +34,7 @@ public class RoomController {
 	}
 	
 	@GetMapping("/members/{roomId}")
-	public Collection<User> getMembers(@PathVariable UUID roomId) {
+	public Collection<Account> getMembers(@PathVariable UUID roomId) {
 		return roomService.getMembers(roomId);
 	}
 }

@@ -1,11 +1,11 @@
 package org.sollabs.messenger.service;
 
+import org.sollabs.messenger.entity.Account;
 import org.sollabs.messenger.entity.Friend;
-import org.sollabs.messenger.entity.User;
 import org.sollabs.messenger.jpa.extend.PredicateBuilder;
 import org.sollabs.messenger.jpa.extend.SearchCriteria;
+import org.sollabs.messenger.repository.AccountRepository;
 import org.sollabs.messenger.repository.FriendRepository;
-import org.sollabs.messenger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +18,7 @@ public class FriendServiceImpl implements FriendService {
 	private FriendRepository friendRepo;
 	
 	@Autowired
-	private UserRepository userRepo;
+	private AccountRepository accountRepo;
 	
 	public Page<Friend> getFriends(long userId, Pageable page) {
 		
@@ -26,32 +26,32 @@ public class FriendServiceImpl implements FriendService {
 				new PredicateBuilder<Friend>(Friend.class, new SearchCriteria("userId", userId, "eq")).getPredicate(), page);
 	}
 	
-	public User addFriend(long myId, long friendId) {
-		User me = userRepo.findOne(myId);
+	public Account addFriend(long myId, long friendId) {
+		Account me = accountRepo.findOne(myId);
 		
-		if (userRepo.exists(friendId)) {
+		if (accountRepo.exists(friendId)) {
 
 			me.addFriend(friendId);
 
-			me = userRepo.save(me);
+			me = accountRepo.save(me);
 		}
 		
-		return userRepo.findOne(friendId); 
+		return accountRepo.findOne(friendId); 
 	}
 	
 	public void removeFriend(long myId, long friendId) {
-		User me = userRepo.findOne(myId);
+		Account me = accountRepo.findOne(myId);
 		
-		if (userRepo.exists(friendId)) {
+		if (accountRepo.exists(friendId)) {
 			
 			me.removeFriend(friendId);			
-			userRepo.save(me);
+			accountRepo.save(me);
 		}
 	}
 
-	public Page<User> searchFriends(Pageable page, Object searchParam, long myId) {
-		return userRepo.findAll(
-				new PredicateBuilder<User>(User.class, new SearchCriteria("name", searchParam, "ct"))
+	public Page<Account> searchFriends(Pageable page, Object searchParam, long myId) {
+		return accountRepo.findAll(
+				new PredicateBuilder<Account>(Account.class, new SearchCriteria("name", searchParam, "ct"))
 				.or(new SearchCriteria("email", searchParam, "eq"))
 				.and(new SearchCriteria("id", myId, "ne")).getPredicate(), page
 				);

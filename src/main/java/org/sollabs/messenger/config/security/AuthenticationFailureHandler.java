@@ -7,7 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
-import org.sollabs.messenger.entity.User;
+import org.sollabs.messenger.entity.Account;
+import org.sollabs.messenger.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.AuthenticationException;
@@ -19,19 +20,19 @@ import org.springframework.stereotype.Component;
 public class AuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 	
 	@Autowired
-	private org.sollabs.messenger.repository.UserRepository userRepo;
+	private AccountRepository accountRepo;
 	
 	@Override
 	@Transactional
 	public void onAuthenticationFailure(HttpServletRequest req, HttpServletResponse resp, AuthenticationException ex) throws IOException, ServletException {
 		String email = req.getParameter("username");
 		
-		User failedAccount = userRepo.findByEmail(email);
+		Account failedAccount = accountRepo.findByEmail(email);
 		
-		failedAccount.setSigninFailure((short) (failedAccount.getSigninFailure()+1));
-		
-		//System.err.println("is Failure?");
-		userRepo.save(failedAccount);
+		if (failedAccount != null) {
+			failedAccount.setSigninFailureCount((short) (failedAccount.getSigninFailureCount()+1));
+			accountRepo.save(failedAccount);
+		}
 		
 		super.setDefaultFailureUrl("/signin?error");
 		super.onAuthenticationFailure(req, resp, ex);

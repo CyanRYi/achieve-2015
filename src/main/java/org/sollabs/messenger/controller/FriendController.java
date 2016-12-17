@@ -3,8 +3,9 @@ package org.sollabs.messenger.controller;
 import java.util.HashMap;
 
 import org.sollabs.messenger.config.security.SystemAuthentication;
+import org.sollabs.messenger.dto.ProfileDTO;
+import org.sollabs.messenger.entity.Account;
 import org.sollabs.messenger.entity.Friend;
-import org.sollabs.messenger.entity.User;
 import org.sollabs.messenger.service.FriendService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,20 +32,19 @@ public class FriendController {
 	}
 	
 	@PostMapping
-	public User addFriends(@RequestBody User friend, SystemAuthentication auth) {
-        return friendService.addFriend(auth.getUserId(), friend.getId());
+	public ProfileDTO addFriends(@RequestBody Account friend, SystemAuthentication auth) {
+        return friendService.addFriend(auth.getUserId(), friend.getId()).getProfile();
 	}
 
 	@DeleteMapping
-	public ResponseEntity<User> removeFriends(@RequestBody User friend, SystemAuthentication auth) {
-		
+	public ResponseEntity<ProfileDTO> removeFriends(@RequestBody Account friend, SystemAuthentication auth) {
 		friendService.removeFriend(auth.getUserId(), friend.getId());
 		
-		return new ResponseEntity<User>(friend, HttpStatus.OK); 
+		return new ResponseEntity<ProfileDTO>(friend.getProfile(), HttpStatus.OK); 
 	}
 	
 	@PostMapping("/search")
-	public Page<User> searchUser(Pageable page, @RequestBody HashMap<String, Object> searchParam, SystemAuthentication auth) {
+	public Page<Account> searchUser(Pageable page, @RequestBody HashMap<String, Object> searchParam, SystemAuthentication auth) {
 		return friendService.searchFriends(page, searchParam.get("params"), auth.getUserId());
 	}
 }

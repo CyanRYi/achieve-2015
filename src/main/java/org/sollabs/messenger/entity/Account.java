@@ -11,48 +11,64 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.SecondaryTable;
+
+import org.sollabs.messenger.dto.AccountDTO;
+import org.sollabs.messenger.dto.ProfileDTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
-public class User {
+@SecondaryTable(name="profile", pkJoinColumns=@PrimaryKeyJoinColumn(name="id"))
+public class Account {
 	
-	public User() {}
-	
-	public User(long id) {
+	public Account() {}
+
+	public Account(long id) {
 		this.id = id;
 	}
-
+	
+	public Account(AccountDTO dto) {
+		this.email = dto.getEmail();
+		this.password = dto.getPassword();
+		this.name = dto.getName();
+	}
+	
 	@Id
 	@GeneratedValue
-	@Column(insertable = false, updatable = false)
 	private long id;
-
-	@Column(nullable = false, unique = true)
+	
+	@Column(nullable=false, unique=true, length=50)
 	private String email;
-
-	@Column(length = 60)
+	
+	@Column(length=60)
 	@JsonIgnore
 	private String password;
-
-	@Column(nullable = false)
-	private String name;
-
-	@Column
-	private String comment;
 	
 	@Column
-	private short signinFailure;
-
+	private short signinFailureCount;
+	
+	
+	@Column(table="profile", length=20, nullable=false)
+	private String name;
+	
+	@Column(table="profile", length=50)
+	private String comment;
+	
+	@Column(table="profile")
+	@Lob
+	private byte[] profileImage;
+	
+	
 	@OneToMany(fetch = FetchType.LAZY, orphanRemoval=true, cascade=CascadeType.ALL)
 	@JoinColumn(name = "userId")
 	private Collection<Friend> myFriends;
 
 	@ManyToMany(cascade=CascadeType.ALL)
-	@JsonManagedReference
 	@JoinTable(name = "UserInRoom", 
 		joinColumns = @JoinColumn(name ="userId", referencedColumnName="id"), 
 		inverseJoinColumns = @JoinColumn(name="roomId", referencedColumnName="id"))
@@ -81,29 +97,13 @@ public class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getComment() {
-		return comment;
-	}
-
-	public void setComment(String comment) {
-		this.comment = comment;
-	}
 	
-	public short getSigninFailure() {
-		return signinFailure;
+	public short getSigninFailureCount() {
+		return signinFailureCount;
 	}
 
-	public void setSigninFailure(short signinFailure) {
-		this.signinFailure = signinFailure;
+	public void setSigninFailureCount(short signinFailureCount) {
+		this.signinFailureCount = signinFailureCount;
 	}
 
 	public Collection<Friend> getMyFriends() {
@@ -138,12 +138,6 @@ public class User {
 	
 	public void removeFriend(long friendId) {
 		this.getMyFriends().remove(new Friend(this.getId(), friendId));
-		/*this.getMyFriends().removeIf(new Predicate<Friend>() {
-			@Override
-			public boolean test(Friend t) {
-				return (t.getFriendId() == friendId);
-			}
-		});*/
 	}
 
 	public Collection<Room> getChannels() {
@@ -152,5 +146,40 @@ public class User {
 
 	public void setChannels(Collection<Room> channels) {
 		this.channels = channels;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+
+	public byte[] getProfileImage() {
+		return profileImage;
+	}
+
+	public void setProfileImage(byte[] profileImage) {
+		this.profileImage = profileImage;
+	}
+	
+	public ProfileDTO getProfile() {
+		ProfileDTO profile = new ProfileDTO();
+		
+		profile.setId(this.getId());
+		profile.setComment(this.getComment());
+		profile.setName(this.getName());
+		profile.setProfileImage(this.getProfileImage());
+		
+		return profile;
 	}
 }

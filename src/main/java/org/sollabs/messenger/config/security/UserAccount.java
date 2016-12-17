@@ -2,18 +2,19 @@ package org.sollabs.messenger.config.security;
 
 import java.util.Collection;
 
-import org.sollabs.messenger.entity.User;
+import org.sollabs.messenger.entity.Account;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 
-public class UserAccount extends org.springframework.security.core.userdetails.User {
+public class UserAccount extends User {
 
 	private final long userId;
 	private final String name;
 	
-	public UserAccount(User user, Collection<? extends GrantedAuthority> authorities) {
-		super(user.getEmail(), user.getPassword(), true, true, user.getSigninFailure() < 5, true, authorities);
-		this.userId = user.getId();
-		this.name = user.getName();
+	public UserAccount(Account account, Collection<? extends GrantedAuthority> authorities) {
+		super(account.getEmail(), account.getPassword(), true, true, account.getSigninFailureCount() < 5, true, authorities);
+		this.userId = account.getId();
+		this.name = account.getName();
 	}
 
 	public long getUserId() {

@@ -2,7 +2,8 @@ package org.sollabs.messenger.config.security;
 
 import java.util.HashSet;
 
-import org.sollabs.messenger.repository.UserRepository;
+import org.sollabs.messenger.entity.Account;
+import org.sollabs.messenger.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,13 +16,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthenticationService implements UserDetailsService {
 
 	@Autowired
-	private UserRepository userRepo;
+	private AccountRepository accountRepo;
 	
 	@Override
 	@Transactional
 	public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-		org.sollabs.messenger.entity.User systemUser = userRepo.findByEmail(userName);
-
-		return new UserAccount(systemUser, new HashSet<GrantedAuthority>());
+		Account account = accountRepo.findByEmail(userName);
+		
+		if (account == null) {
+			throw new UsernameNotFoundException("존재하지 않는 아이디");
+		}
+		return new UserAccount(account, new HashSet<GrantedAuthority>());
 	}
 }

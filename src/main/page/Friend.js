@@ -112,7 +112,7 @@ class Friend extends React.Component {
 		_promise.then(
 			function(response) {
 				let roomId = JSON.parse(response).id;
-				router.push("/rooms/:" + roomId);
+				router.push("/rooms/" + roomId);
 			}, function(error) {
 				console.log(error);
 			}

@@ -7,8 +7,8 @@ import javax.transaction.Transactional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.sollabs.messenger.entity.User;
-import org.sollabs.messenger.repository.UserRepository;
+import org.sollabs.messenger.entity.Account;
+import org.sollabs.messenger.repository.AccountRepository;
 import org.sollabs.messenger.service.FriendService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,7 +22,7 @@ public class UserTest {
 	private FriendService friendService;
 	
 	@Autowired
-	private UserRepository userRepo;
+	private AccountRepository accountRepo;
 
 	@Before
 	public void setup() {
@@ -33,7 +33,7 @@ public class UserTest {
 	@Transactional
 	public void addFriend() {
 
-		User me = userRepo.findOne(1L);
+		Account me = accountRepo.findOne(1L);
 		
 		System.out.println("Friends Size : " + me.getMyFriends().size());
 		int friendsSize = me.getMyFriends().size();
@@ -48,7 +48,7 @@ public class UserTest {
 	@Test
 	@Transactional
 	public void removeFriend() {
-		User me = userRepo.findOne(1L);
+		Account me = accountRepo.findOne(1L);
 		
 		System.out.println("Friends Size : " + me.getMyFriends().size());
 		int friendsSize = me.getMyFriends().size();

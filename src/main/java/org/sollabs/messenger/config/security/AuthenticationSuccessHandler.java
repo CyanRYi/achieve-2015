@@ -7,8 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
-import org.sollabs.messenger.entity.User;
-import org.sollabs.messenger.repository.UserRepository;
+import org.sollabs.messenger.entity.Account;
+import org.sollabs.messenger.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 	
 	@Autowired
-	private UserRepository userRepo;
+	private AccountRepository accountRepo;
 	
 	@Override
 	@Transactional
@@ -29,13 +29,13 @@ public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccess
 		String email = req.getParameter("username");
 		//String signinIpAddr = req.getRemoteAddr();
 		
-		User signinAccount = userRepo.findByEmail(email);
-		signinAccount.setSigninFailure((short) 0);
+		Account signinAccount = accountRepo.findByEmail(email);
+		signinAccount.setSigninFailureCount((short) 0);
 		
 		//signinAccount.setLastSigninIp(signinIpAddr);
 		//signinAccount.setLastSigninTime(new Date());
 		
-		userRepo.save(signinAccount);
+		accountRepo.save(signinAccount);
 		
 		
 		// 1. 소속된 방의 정보를 통해 세션 접속		signinAccount.getChannels()

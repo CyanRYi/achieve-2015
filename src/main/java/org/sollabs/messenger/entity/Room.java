@@ -32,9 +32,9 @@ public class Room {
 	public Room() {}
 	
 	public Room(long firstMemberId, long secondMemberId) {
-		member = new HashSet<User>();
-		member.add(new User(firstMemberId));
-		member.add(new User(secondMemberId));
+		member = new HashSet<Account>();
+		member.add(new Account(firstMemberId));
+		member.add(new Account(secondMemberId));
 	}
 	
 	@Id
@@ -49,7 +49,7 @@ public class Room {
 	@JoinTable(name = "UserInRoom", 
 		joinColumns = @JoinColumn(name ="roomId", referencedColumnName="id"), 
 		inverseJoinColumns = @JoinColumn(name="userId", referencedColumnName="id", insertable=false, updatable=false))
-	private Collection<User> member;
+	private Collection<Account> member;
 	
 	@OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL)
 	@JsonIgnore
@@ -62,21 +62,21 @@ public class Room {
 	public UUID getId() {
 		return id;
 	}
-
-	public Collection<User> getMember() {
+	
+	public Collection<Account> getMember() {
 		return member;
 	}
 
-	public void setMember(Collection<User> member) {
+	public void setMember(Collection<Account> member) {
 		this.member = member;
 	}
-	
+
 	@JsonGetter("memberNames")
 	public String getMemberNames() {
 		
 		StringBuffer sb = new StringBuffer();
 		
-		Iterator<User> members = this.getMember().iterator();
+		Iterator<Account> members = this.getMember().iterator();
 		
 		while(members.hasNext()) {
 			sb.append(members.next().getName());

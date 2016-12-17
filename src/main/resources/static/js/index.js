@@ -74,9 +74,13 @@
 
 	var _Friend2 = _interopRequireDefault(_Friend);
 
-	var _room = __webpack_require__(507);
+	var _Room = __webpack_require__(507);
 
-	var _room2 = _interopRequireDefault(_room);
+	var _Room2 = _interopRequireDefault(_Room);
+
+	var _MyInfo = __webpack_require__(512);
+
+	var _MyInfo2 = _interopRequireDefault(_MyInfo);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -188,14 +192,9 @@
 			_reactRouter.Route,
 			{ path: '/', component: App },
 			_react2.default.createElement(_reactRouter.IndexRoute, { component: _Friend2.default }),
+			_react2.default.createElement(_reactRouter.Route, { path: '/myInfo', component: _MyInfo2.default }),
 			_react2.default.createElement(_reactRouter.Route, { path: '/users', component: _Friend2.default }),
-			_react2.default.createElement(
-				_reactRouter.Route,
-				{ path: '/rooms', component: _room2.default },
-				_react2.default.createElement(_reactRouter.Route, { path: ':childrenData', handler: function handler(props) {
-						return _react2.default.createElement(_room2.default, { childrenData: undefined.props.params.childrenData });
-					} })
-			)
+			_react2.default.createElement(_reactRouter.Route, { path: '/rooms(/:childrenData)', component: _Room2.default })
 		)
 	), document.getElementById('app'));
 
@@ -28018,7 +28017,7 @@
 								{ title: username, id: 'personal-nav-menu-dropdown' },
 								_react2.default.createElement(
 									_reactRouterBootstrap.LinkContainer,
-									{ to: '/#' },
+									{ to: '/myInfo' },
 									_react2.default.createElement(
 										_reactBootstrap.MenuItem,
 										null,
@@ -47421,7 +47420,7 @@
 				var router = this.props.router;
 				_promise.then(function (response) {
 					var roomId = JSON.parse(response).id;
-					router.push("/rooms/:" + roomId);
+					router.push("/rooms/" + roomId);
 				}, function (error) {
 					console.log(error);
 				});
@@ -47595,6 +47594,7 @@
 	                            success(xhr.responseText);
 	                        } else return true;
 	                    } else {
+	                        console.log(JSON.parse(xhr));
 	                        error(xhr);
 	                    }
 	                }
@@ -47602,7 +47602,7 @@
 	            if (method === 'GET' || method === 'get') {
 	                xhr.send();
 	            } else {
-	                xhr.send(JSON.stringify(params));
+	                xhr.send(JSON.stringify(param));
 	            }
 	        }
 	    }]);
@@ -47860,11 +47860,8 @@
 				activePage: 1,
 				mask: false,
 				editMode: false,
-				roomId: _this.props.route.childrenData
+				roomId: _this.props.params.childrenData
 			};
-
-			console.log(_this.props);
-			console.log(_this.props.route.childrenData);
 
 			_this.bindData = _this.bindData.bind(_this);
 			_this.retrieveData = _this.retrieveData.bind(_this);
@@ -47873,6 +47870,11 @@
 		}
 
 		_createClass(Room, [{
+			key: 'navigate',
+			value: function navigate() {
+				this.props.history.replaceState(null, '/');
+			}
+		}, {
 			key: 'componentWillMount',
 			value: function componentWillMount() {
 				this.retrieveData();
@@ -48051,15 +48053,15 @@
 
 	var _WebSocketClient2 = _interopRequireDefault(_WebSocketClient);
 
-	var _ChatHeader = __webpack_require__(562);
+	var _ChatHeader = __webpack_require__(509);
 
 	var _ChatHeader2 = _interopRequireDefault(_ChatHeader);
 
-	var _ChatFooter = __webpack_require__(563);
+	var _ChatFooter = __webpack_require__(510);
 
 	var _ChatFooter2 = _interopRequireDefault(_ChatFooter);
 
-	var _Message = __webpack_require__(564);
+	var _Message = __webpack_require__(511);
 
 	var _Message2 = _interopRequireDefault(_Message);
 
@@ -48092,7 +48094,6 @@
 			_this.closeChat = _this.closeChat.bind(_this);
 			_this.handleSubmit = _this.handleSubmit.bind(_this);
 			_this.connectStateChange = _this.connectStateChange.bind(_this);
-			_this.setMember = _this.setMember.bind(_this);
 			return _this;
 		}
 
@@ -48158,16 +48159,26 @@
 		}, {
 			key: 'retrieveData',
 			value: function retrieveData(page, params) {
-				this.sendProxyRequest('./messages?page=0&size=10&roomId=' + this.props.roomId, 'GET', this.bindData);
+				var me = this;
+				var roomId = this.props.roomId;
+				var AJAX = new _Ajax2.default();
 
-				this.sendProxyRequest('./rooms/members/' + this.props.roomId, 'GET', this.setMember);
-			}
-		}, {
-			key: 'setMember',
-			value: function setMember(response) {
-				this.setState({
-					members: JSON.parse(response)
+				var promiseMember = new Promise(function (resolve, reject) {
+					AJAX.call('./rooms/members/' + roomId, 'GET', resolve, reject);
 				});
+
+				if (roomId) {
+					promiseMember.then(function (response) {
+						var result = JSON.parse(response);
+						me.setState({
+							members: result
+						});
+					}, function (error) {
+						console.log(error);
+					}).then(AJAX.call('./messages?page=0&size=10&roomId=' + roomId, 'GET', this.bindData, console.log));
+				} else {
+					AJAX.call('./messages?page=0&size=10&roomId=' + roomId, 'GET', this.bindData, reject);
+				}
 			}
 		}, {
 			key: 'bindData',
@@ -48238,60 +48249,7 @@
 	exports.default = Chat;
 
 /***/ },
-/* 509 */,
-/* 510 */,
-/* 511 */,
-/* 512 */,
-/* 513 */,
-/* 514 */,
-/* 515 */,
-/* 516 */,
-/* 517 */,
-/* 518 */,
-/* 519 */,
-/* 520 */,
-/* 521 */,
-/* 522 */,
-/* 523 */,
-/* 524 */,
-/* 525 */,
-/* 526 */,
-/* 527 */,
-/* 528 */,
-/* 529 */,
-/* 530 */,
-/* 531 */,
-/* 532 */,
-/* 533 */,
-/* 534 */,
-/* 535 */,
-/* 536 */,
-/* 537 */,
-/* 538 */,
-/* 539 */,
-/* 540 */,
-/* 541 */,
-/* 542 */,
-/* 543 */,
-/* 544 */,
-/* 545 */,
-/* 546 */,
-/* 547 */,
-/* 548 */,
-/* 549 */,
-/* 550 */,
-/* 551 */,
-/* 552 */,
-/* 553 */,
-/* 554 */,
-/* 555 */,
-/* 556 */,
-/* 557 */,
-/* 558 */,
-/* 559 */,
-/* 560 */,
-/* 561 */,
-/* 562 */
+/* 509 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -48366,7 +48324,7 @@
 	exports.default = ChatHeader;
 
 /***/ },
-/* 563 */
+/* 510 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -48461,7 +48419,7 @@
 	exports.default = ChatFooter;
 
 /***/ },
-/* 564 */
+/* 511 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -48532,6 +48490,432 @@
 	}(_react2.default.Component);
 
 	exports.default = Message;
+
+/***/ },
+/* 512 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _Ajax = __webpack_require__(505);
+
+	var _Ajax2 = _interopRequireDefault(_Ajax);
+
+	var _EditPassword = __webpack_require__(513);
+
+	var _EditPassword2 = _interopRequireDefault(_EditPassword);
+
+	var _reactBootstrap = __webpack_require__(248);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var MyInfo = function (_React$Component) {
+		_inherits(MyInfo, _React$Component);
+
+		function MyInfo(props) {
+			_classCallCheck(this, MyInfo);
+
+			var _this = _possibleConstructorReturn(this, (MyInfo.__proto__ || Object.getPrototypeOf(MyInfo)).call(this, props));
+
+			_this.state = {
+				editPassword: false,
+				mask: false
+			};
+
+			_this.retrieveData = _this.retrieveData.bind(_this);
+			_this.bindData = _this.bindData.bind(_this);
+			_this.handleChange = _this.handleChange.bind(_this);
+			return _this;
+		}
+
+		_createClass(MyInfo, [{
+			key: 'componentWillMount',
+			value: function componentWillMount() {
+				this.retrieveData();
+			}
+		}, {
+			key: 'componentWillUnmount',
+			value: function componentWillUnmount() {
+				if (this.serverRequest) {
+					this.serverRequest.abort();
+				}
+			}
+		}, {
+			key: 'retrieveData',
+			value: function retrieveData() {
+				this.setState({ mask: true });
+				this.sendProxyRequest('/users', 'GET', this.bindData);
+			}
+		}, {
+			key: 'sendProxyRequest',
+			value: function sendProxyRequest(url, method, success, error, requestParam) {
+				var AJAX = new _Ajax2.default();
+
+				AJAX.call(url, method, success, error, requestParam);
+			}
+		}, {
+			key: 'bindData',
+			value: function bindData(response) {
+				var result = JSON.parse(response);
+
+				this.setState({
+					email: result.email,
+					name: result.name,
+					comment: result.comment,
+					mask: false
+				});
+			}
+		}, {
+			key: 'handleChange',
+			value: function handleChange(event) {
+				if (event.target.id === 'name') {
+					if (event.target.value <= 20) {
+						this.setState({ name: event.target.value });
+					}
+				} else if (event.target.id === 'comment') {
+					if (event.target.value <= 50) {
+						this.setState({ comment: event.target.value });
+					}
+				}
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				var _this2 = this;
+
+				return _react2.default.createElement(
+					'div',
+					null,
+					_react2.default.createElement(
+						_reactBootstrap.Modal,
+						{
+							show: this.state.mask,
+							onHide: function onHide() {
+								return _this2.setState({ mask: false });
+							},
+							container: this,
+							dialogClassName: 'loadingMask' },
+						_react2.default.createElement('img', { src: '/images/loading.gif', width: '100', height: '100' })
+					),
+					_react2.default.createElement(_EditPassword2.default, {
+						show: this.state.editPassword,
+						onHide: function onHide() {
+							return _this2.setState({ editPassword: false });
+						} }),
+					_react2.default.createElement(
+						_reactBootstrap.Form,
+						{ horizontal: true },
+						_react2.default.createElement(
+							_reactBootstrap.FormGroup,
+							null,
+							_react2.default.createElement(
+								_reactBootstrap.Col,
+								{ componentClass: _reactBootstrap.ControlLabel, sm: 2 },
+								'E-mail'
+							),
+							_react2.default.createElement(
+								_reactBootstrap.Col,
+								{ sm: 10 },
+								_react2.default.createElement(
+									_reactBootstrap.FormControl.Static,
+									null,
+									this.state.email
+								)
+							)
+						),
+						_react2.default.createElement(
+							_reactBootstrap.FormGroup,
+							null,
+							_react2.default.createElement(
+								_reactBootstrap.Col,
+								{ componentClass: _reactBootstrap.ControlLabel, sm: 2 },
+								'\uC774\uB984'
+							),
+							_react2.default.createElement(
+								_reactBootstrap.Col,
+								{ sm: 10 },
+								_react2.default.createElement(_reactBootstrap.FormControl, { id: 'name', type: 'text', placeholder: '\uC774\uB984', onChange: this.handleChange, value: this.state.name })
+							)
+						),
+						_react2.default.createElement(
+							_reactBootstrap.FormGroup,
+							null,
+							_react2.default.createElement(
+								_reactBootstrap.Col,
+								{ componentClass: _reactBootstrap.ControlLabel, sm: 2 },
+								'\uCF54\uBA58\uD2B8'
+							),
+							_react2.default.createElement(
+								_reactBootstrap.Col,
+								{ sm: 10 },
+								_react2.default.createElement(_reactBootstrap.FormControl, { id: 'comment', type: 'text', placeholder: '\uCF54\uBA58\uD2B8', onChange: this.handleChange, value: this.state.comment })
+							)
+						),
+						_react2.default.createElement(
+							_reactBootstrap.FormGroup,
+							null,
+							_react2.default.createElement(
+								_reactBootstrap.Col,
+								{ smOffset: 2, sm: 5 },
+								_react2.default.createElement(
+									_reactBootstrap.Button,
+									{ bsStyle: 'warning', onClick: function onClick() {
+											return _this2.setState({ editPassword: true });
+										} },
+									'\uBE44\uBC00\uBC88\uD638 \uBCC0\uACBD'
+								)
+							),
+							_react2.default.createElement(
+								_reactBootstrap.Col,
+								{ sm: 5 },
+								_react2.default.createElement(
+									_reactBootstrap.Button,
+									null,
+									'\uC800\uC7A5'
+								)
+							)
+						)
+					)
+				);
+			}
+		}]);
+
+		return MyInfo;
+	}(_react2.default.Component);
+
+	exports.default = MyInfo;
+
+/***/ },
+/* 513 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _Ajax = __webpack_require__(505);
+
+	var _Ajax2 = _interopRequireDefault(_Ajax);
+
+	var _reactBootstrap = __webpack_require__(248);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var EditPassword = function (_React$Component) {
+	  _inherits(EditPassword, _React$Component);
+
+	  function EditPassword(props) {
+	    _classCallCheck(this, EditPassword);
+
+	    var _this = _possibleConstructorReturn(this, (EditPassword.__proto__ || Object.getPrototypeOf(EditPassword)).call(this, props));
+
+	    _this.state = {
+	      newPassword: '',
+	      passwordRepeat: '',
+	      validationMessage: '　',
+	      validationState: {}
+	    };
+	    _this.handleChange = _this.handleChange.bind(_this);
+	    _this.handleSubmit = _this.handleSubmit.bind(_this);
+	    _this.closeModal = _this.closeModal.bind(_this);
+	    return _this;
+	  }
+
+	  _createClass(EditPassword, [{
+	    key: 'handleChange',
+	    value: function handleChange(event) {
+	      var _setState;
+
+	      var validationState = Object.assign({}, this.state.validationState);
+	      validationState[event.target.id] = 'success';
+
+	      var validationMessage = '　';
+	      var repeated = void 0;
+
+	      var anotherValue = void 0;
+	      if (event.target.id === 'newPassword') {
+	        anotherValue = this.state.passwordRepeat;
+	      } else if (event.target.id === 'passwordRepeat') {
+	        anotherValue = this.state.newPassword;
+	      }
+
+	      if (anotherValue && event.target.value !== anotherValue) {
+	        repeated = false;
+	      } else if (anotherValue === event.target.value) {
+	        repeated = true;
+	      }
+
+	      if (event.target.value.length < 8) {
+	        validationState[event.target.id] = 'error';
+	        validationMessage = '비밀번호는 8자 이상이어야 합니다.';
+	      } else {
+	        if (repeated === true) {
+	          validationState.newPassword = 'success';
+	          validationState.passwordRepeat = 'success';
+	        } else if (repeated === false) {
+	          validationState.newPassword = 'error';
+	          validationState.passwordRepeat = 'error';
+	          validationMessage = '비밀번호가 일치하지 않습니다.';
+	        }
+	      }
+
+	      this.setState((_setState = {}, _defineProperty(_setState, event.target.id, event.target.value), _defineProperty(_setState, 'validationState', validationState), _defineProperty(_setState, 'validationMessage', validationMessage), _setState));
+	    }
+	  }, {
+	    key: 'closeModal',
+	    value: function closeModal() {
+	      this.setState({
+	        newPassword: '',
+	        passwordRepeat: '',
+	        validationMessage: '　',
+	        validationState: {}
+	      });
+
+	      this.props.onHide();
+	    }
+	  }, {
+	    key: 'handleSubmit',
+	    value: function handleSubmit() {
+	      var AJAX = new _Ajax2.default();
+
+	      var params = {
+	        oldPassword: this.state.oldPassword,
+	        password: this.state.newPassword,
+	        passwordRepeat: this.state.passwordRepeat
+	      };
+
+	      AJAX.call('/users/password', 'PUT', console.log, console.log, params);
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var _this2 = this;
+
+	      return _react2.default.createElement(
+	        _reactBootstrap.Modal,
+	        {
+	          show: this.props.show,
+	          onHide: this.closeModal },
+	        _react2.default.createElement(_reactBootstrap.Modal.Header, { closeButton: true }),
+	        _react2.default.createElement(
+	          _reactBootstrap.Modal.Body,
+	          null,
+	          _react2.default.createElement(
+	            _reactBootstrap.Form,
+	            { horizontal: true },
+	            _react2.default.createElement(
+	              _reactBootstrap.FormGroup,
+	              { validationState: this.state.validationState["oldPassword"] },
+	              _react2.default.createElement(
+	                _reactBootstrap.Col,
+	                { componentClass: _reactBootstrap.ControlLabel, sm: 4 },
+	                '\uAE30\uC874 \uBE44\uBC00\uBC88\uD638'
+	              ),
+	              _react2.default.createElement(
+	                _reactBootstrap.Col,
+	                { sm: 8 },
+	                _react2.default.createElement(_reactBootstrap.FormControl, { id: 'oldPassword', type: 'password', placeholder: '\uAE30\uC874 \uBE44\uBC00\uBC88\uD638', onChange: function onChange(event) {
+	                    return _this2.setState({ oldPassword: event.target.value });
+	                  } })
+	              )
+	            ),
+	            _react2.default.createElement(
+	              _reactBootstrap.FormGroup,
+	              { validationState: this.state.validationState["newPassword"] },
+	              _react2.default.createElement(
+	                _reactBootstrap.Col,
+	                { componentClass: _reactBootstrap.ControlLabel, sm: 4 },
+	                '\uC0C8 \uBE44\uBC00\uBC88\uD638'
+	              ),
+	              _react2.default.createElement(
+	                _reactBootstrap.Col,
+	                { sm: 8 },
+	                _react2.default.createElement(_reactBootstrap.FormControl, { id: 'newPassword', type: 'password', placeholder: '\uC0C8 \uBE44\uBC00\uBC88\uD638', onChange: this.handleChange })
+	              )
+	            ),
+	            _react2.default.createElement(
+	              _reactBootstrap.FormGroup,
+	              { validationState: this.state.validationState["passwordRepeat"] },
+	              _react2.default.createElement(
+	                _reactBootstrap.Col,
+	                { componentClass: _reactBootstrap.ControlLabel, sm: 4 },
+	                '\uBE44\uBC00\uBC88\uD638 \uD655\uC778'
+	              ),
+	              _react2.default.createElement(
+	                _reactBootstrap.Col,
+	                { sm: 8 },
+	                _react2.default.createElement(_reactBootstrap.FormControl, { id: 'passwordRepeat', type: 'password', placeholder: '\uBE44\uBC00\uBC88\uD638 \uD655\uC778', onChange: this.handleChange })
+	              )
+	            ),
+	            _react2.default.createElement(
+	              _reactBootstrap.Col,
+	              { smOffset: 2, sm: 10 },
+	              _react2.default.createElement(
+	                _reactBootstrap.HelpBlock,
+	                null,
+	                this.state.validationMessage
+	              )
+	            )
+	          )
+	        ),
+	        _react2.default.createElement(
+	          _reactBootstrap.Modal.Footer,
+	          null,
+	          _react2.default.createElement(
+	            _reactBootstrap.ButtonGroup,
+	            { bsSize: 'small', className: 'pull-right' },
+	            _react2.default.createElement(
+	              _reactBootstrap.Button,
+	              { bsStyle: 'primary', onClick: this.handleSubmit },
+	              '\uC800\uC7A5'
+	            ),
+	            _react2.default.createElement(
+	              _reactBootstrap.Button,
+	              { bsStyle: 'danger', onClick: this.closeModal },
+	              '\uB2EB\uAE30'
+	            )
+	          )
+	        )
+	      );
+	    }
+	  }]);
+
+	  return EditPassword;
+	}(_react2.default.Component);
+
+	exports.default = EditPassword;
 
 /***/ }
 /******/ ]);

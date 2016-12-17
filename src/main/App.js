@@ -6,7 +6,8 @@ import WebSocketClient from './component/WebSocketClient.js'
 import Header from './frame/Header.js';
 
 import Friend from './page/Friend.js';
-import Room from './page/room.js';
+import Room from './page/Room.js';
+import MyInfo from './page/MyInfo.js';
 
 export default class App extends React.Component {
 	constructor(props) {
@@ -91,10 +92,9 @@ ReactDOM.render((
 		<Router history={hashHistory}>
 			<Route path="/" component={App}>
 				<IndexRoute component={Friend}></IndexRoute>
+				<Route path="/myInfo" component={MyInfo}></Route>
 				<Route path="/users" component={Friend}></Route>
-				<Route path="/rooms" component={Room}>
-					<Route path=":childrenData"  handler={(props) => (<Room childrenData={this.props.params.childrenData} />)} />
-				</Route>
+				<Route path="/rooms(/:childrenData)" component={Room}></Route>
 			</Route>
 		</Router>
 ), document.getElementById('app'));

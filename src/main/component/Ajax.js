@@ -30,6 +30,7 @@ class CommonAjaxHandler {
             	}
 							else return true;
             } else {
+								console.log(JSON.parse(xhr));
                 error(xhr);
             }
         }
@@ -38,7 +39,7 @@ class CommonAjaxHandler {
     	xhr.send();
     }
     else {
-    	xhr.send(JSON.stringify(params));
+    	xhr.send(JSON.stringify(param));
     }
 	}
 };

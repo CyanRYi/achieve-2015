@@ -15,16 +15,16 @@ export default class Room extends React.Component {
 			activePage : 1,
 			mask : false,
 			editMode : false,
-			roomId : this.props.route.childrenData
+			roomId : this.props.params.childrenData
 		};
-
-		console.log(this.props);
-		console.log(this.props.route.childrenData);
-
 
 		this.bindData = this.bindData.bind(this);
 		this.retrieveData = this.retrieveData.bind(this);
 		this.openRoom = this.openRoom.bind(this);
+	}
+
+	navigate() {
+		this.props.history.replaceState(null, '/');
 	}
 
 	componentWillMount() {

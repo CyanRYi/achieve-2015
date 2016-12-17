@@ -3,9 +3,9 @@ package org.sollabs.messenger.service;
 import java.util.Collection;
 import java.util.UUID;
 
+import org.sollabs.messenger.entity.Account;
 import org.sollabs.messenger.entity.QRoom;
 import org.sollabs.messenger.entity.Room;
-import org.sollabs.messenger.entity.User;
 import org.sollabs.messenger.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,8 +26,8 @@ public class RoomServiceImpl implements RoomService {
 		
 		BooleanBuilder builder = new BooleanBuilder();
 		
-		builder.and(room.member.contains(new User(myId)));
-		builder.and(room.member.contains(new User(friendId)));
+		builder.and(room.member.contains(new Account(myId)));
+		builder.and(room.member.contains(new Account(friendId)));
 		builder.and(room.member.size().eq(2));
 		
 		if (roomRepo.exists(builder)) {
@@ -42,8 +42,8 @@ public class RoomServiceImpl implements RoomService {
 		}
 		/*
 		roomRepo.exists(
-				new PredicateBuilder<Room>(Room.class, new SearchCriteria("member", new User(myId), "ct"))
-				.and(new SearchCriteria("member", new User(friendId), "ct"))
+				new PredicateBuilder<Room>(Room.class, new SearchCriteria("member", new Profile(myId), "ct"))
+				.and(new SearchCriteria("member", new Profile(friendId), "ct"))
 				.and(new SearchCriteria("member", 2, "eq")).getPredicate());*/
 	}
 
@@ -51,10 +51,10 @@ public class RoomServiceImpl implements RoomService {
 
 		QRoom room = QRoom.room;
 		
-		return roomRepo.findAll(new BooleanBuilder().and(new BooleanBuilder().and(room.member.contains(new User(myId)))), page);
+		return roomRepo.findAll(new BooleanBuilder().and(new BooleanBuilder().and(room.member.contains(new Account(myId)))), page);
 	}
 
-	public Collection<User> getMembers(UUID roomId) {
+	public Collection<Account> getMembers(UUID roomId) {
 		return roomRepo.findOne(roomId).getMember();
 	}
 
