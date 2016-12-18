@@ -28,4 +28,8 @@ public class MessageServiceImpl implements MessageService {
 		return messageRepo.findAll(builder, page);
 	}
 
+	public Message saveMessage(Message message) {
+		return messageRepo.save(message);
+	}
+
 }

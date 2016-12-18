@@ -9,19 +9,25 @@ export default class Room extends React.Component {
 	constructor(props) {
 		super(props);
 
+		if (!this.props.ws) {
+			location.href='/';
+		}
+
 		this.state = {
 			data : [],
 			maxpage : 1,
 			activePage : 1,
 			mask : false,
 			editMode : false,
-			roomId : this.props.params.childrenData
+			roomId : this.props.params.childrenData,
+			legacyOnMessage : this.props.ws.onMessage
 		};
 
 		this.bindData = this.bindData.bind(this);
 		this.retrieveData = this.retrieveData.bind(this);
 		this.openRoom = this.openRoom.bind(this);
 		this.closeChat = this.closeChat.bind(this);
+		this.onReceiveMessage = this.onReceiveMessage.bind(this);
 	}
 
 	componentWillMount() {
@@ -29,8 +35,35 @@ export default class Room extends React.Component {
 	}
 
 	componentWillUnmount() {
+		this.props.ws.onMessage = this.state.legacyOnMessage;
+
 		if (this.serverRequest) {
 			this.serverRequest.abort();
+		}
+	}
+
+	componentDidMount() {
+		let me = this;
+
+		this.props.ws.onMessage = function(message) {
+			me.state.legacyOnMessage(message);
+			me.onReceiveMessage(message);
+		};
+	}
+
+	onReceiveMessage(response) {
+		let message = JSON.parse(response.data);
+
+		var rooms = this.state.data.slice(0);
+
+		var roomWhereMessage = rooms.filter(m => m.id == message.roomId)[0];
+
+		if (roomWhereMessage) {
+			roomWhereMessage.lastMessage = message.content;
+			this.setState({data : rooms});
+		}
+		else {
+			this.retrieveData();
 		}
 	}
 
@@ -98,7 +131,7 @@ export default class Room extends React.Component {
 			return (
 				<Chat
 					roomId={this.state.roomId} closeChat={this.closeChat}
-					onKeyPress={this.handleKeyEvent} />
+					onKeyPress={this.handleKeyEvent} ws={this.props.ws} />
 			);
 		}
 		else {

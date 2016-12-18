@@ -23,6 +23,10 @@ class WebSocketClient {
     this.ws.onclose = callback;
   }
 
+  get onMessage() {
+    return this.ws.onmessage;
+  }
+  
   set onMessage(callback) {
     this.ws.onmessage = callback;
   }

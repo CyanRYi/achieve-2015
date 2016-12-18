@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 import org.sollabs.messenger.entity.Account;
+import org.sollabs.messenger.entity.Message;
 import org.sollabs.messenger.entity.QRoom;
 import org.sollabs.messenger.entity.Room;
 import org.sollabs.messenger.repository.RoomRepository;
@@ -39,16 +40,10 @@ public class RoomServiceImpl implements RoomService {
 			// TODO	생성된 방에 두 유저 모두 세션 접속
 			
 			return roomRepo.save(newRoom);
-		}
-		/*
-		roomRepo.exists(
-				new PredicateBuilder<Room>(Room.class, new SearchCriteria("member", new Profile(myId), "ct"))
-				.and(new SearchCriteria("member", new Profile(friendId), "ct"))
-				.and(new SearchCriteria("member", 2, "eq")).getPredicate());*/
+		}		
 	}
 
 	public Page<Room> getRooms(Pageable page, long myId) {
-
 		QRoom room = QRoom.room;
 		
 		return roomRepo.findAll(new BooleanBuilder().and(new BooleanBuilder().and(room.member.contains(new Account(myId)))), page);
@@ -56,6 +51,13 @@ public class RoomServiceImpl implements RoomService {
 
 	public Collection<Account> getMembers(UUID roomId) {
 		return roomRepo.findOne(roomId).getMember();
+	}
+	
+	public Room updateLastMessage(Message message) {
+		// Set Room.LastMessage
+		Room room = roomRepo.findOne(message.getRoomId());
+		room.setLastMessage(message.getContent());		
+		return roomRepo.save(room);
 	}
 
 }

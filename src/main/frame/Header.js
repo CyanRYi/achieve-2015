@@ -10,57 +10,39 @@ export default class Header extends React.Component {
 		super(props);
 
 		this.state = {
-			client : null,
-			readtState : 3,
-			hasNewMessage : false,
-			message : []
+			readyState : 3
 		};
 
 		this.connectStateChange = this.connectStateChange.bind(this);
-		this.onReceiveMessage = this.onReceiveMessage.bind(this);
 	}
 
 	componentWillUnmount() {
-		this.state.client.close();
+		this.props.onClose();
 	}
 
 	connectStateChange(state) {
 		this.setState({
-			readtState : state
-		});
-	}
-
-	onReceiveMessage(message) {
-		this.setState({
-			hasNewMessage : true
+			readyState : state
 		});
 	}
 
 	componentDidMount() {
-		var ws;
+		var ws = new WebSocketClient("ws://localhost:9000/connect");
 
-		if (this.state.client) {
-			ws = this.state.client;
-		}
-		else {
-			ws = new WebSocketClient("ws://localhost:9000/connect");
-		}
-
-		let stateChangeFunc = this.connectStateChange;
+		let me = this;
 
 		ws.onOpen = function(event) {
-			stateChangeFunc(ws.readyState);
+			me.props.onOpen(ws);
+			me.connectStateChange(ws.readyState);
 		};
 
 		ws.onClose = function(event) {
-			stateChangeFunc(ws.readyState);
+			me.connectStateChange(ws.readyState);
 		};
 
 		ws.onError = function(event) {
-			stateChangeFunc(ws.readyState);
+			me.connectStateChange(ws.readyState);
 		};
-
-		ws.onMessage = this.onReceiveMessage;
 
 		this.setState({
 			client : ws

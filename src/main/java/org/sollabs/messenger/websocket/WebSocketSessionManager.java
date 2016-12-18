@@ -1,10 +1,10 @@
 package org.sollabs.messenger.websocket;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.transaction.Transactional;
 
@@ -12,9 +12,8 @@ import org.sollabs.messenger.config.security.SystemAuthentication;
 import org.sollabs.messenger.entity.Account;
 import org.sollabs.messenger.entity.Message;
 import org.sollabs.messenger.entity.Room;
-import org.sollabs.messenger.repository.AccountRepository;
-import org.sollabs.messenger.repository.MessageRepository;
-import org.sollabs.messenger.repository.RoomRepository;
+import org.sollabs.messenger.service.MessageService;
+import org.sollabs.messenger.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
@@ -28,48 +27,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class WebSocketSessionManager {
 
 	@Autowired
-	private AccountRepository accountRepo;
+	private MessageService messageService;
 	
 	@Autowired
-	private MessageRepository messageRepo;
+	private RoomService roomService;
 	
-	@Autowired
-	private RoomRepository roomRepo;
+	private Map<Long, WebSocketSession> connections = new HashMap<Long, WebSocketSession>();
 	
-	private Map<UUID, HashSet<WebSocketSession>> sessions = new HashMap<UUID, HashSet<WebSocketSession>>();
+	//private Map<UUID, HashSet<WebSocketSession>> sessions = new HashMap<UUID, HashSet<WebSocketSession>>();
 	
-	@Transactional
 	public void addSession(WebSocketSession session) {
 		long userId = ((SystemAuthentication)session.getPrincipal()).getUserId();
 		
-		Account sessionInfo = accountRepo.findOne(userId);
-		
-		for(Room channel : sessionInfo.getChannels()) {
-			UUID roomId = channel.getId();
-			
-			if (!sessions.containsKey(roomId)) {
-				sessions.put(roomId, new HashSet<WebSocketSession>());
-			}
-			
-			sessions.get(roomId).add(session);
-		}
+		connections.put(userId, session);
 	}
 	
-	@Transactional
 	public void removeSession(WebSocketSession session) {
 		long userId = ((SystemAuthentication)session.getPrincipal()).getUserId();
 		
-		Account sessionInfo = accountRepo.findOne(userId);
-		
-		for(Room channel : sessionInfo.getChannels()) {
-			UUID roomId = channel.getId();
-			
-			sessions.get(roomId).remove(session);
-			
-			if (sessions.get(roomId).size() == 0) {
-				sessions.remove(roomId);
-			}
-		}
+		connections.remove(userId);
 	}
 	
 	@Transactional
@@ -83,20 +59,19 @@ public class WebSocketSessionManager {
 		msg = mapper.readValue(message.getPayload(), Message.class);
 		msg.setSendedBy(userId);
 		
+		msg = messageService.saveMessage(msg);
 		
-		// Set Room.LastMessage
-		Room room = roomRepo.findOne(msg.getRoomId());
-		room.setLastMessage(msg.getContent());		
-		roomRepo.save(room);
+		Room room = roomService.updateLastMessage(msg);
 		
-		try {
-			msg = messageRepo.save(msg);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		List<Account> unConnectedMember = new ArrayList<Account>();
 		
-		for(WebSocketSession sess : sessions.get(msg.getRoomId())) {
-			sess.sendMessage(new TextMessage(mapper.writeValueAsString(msg)));
+		for(Account member : room.getMember()) {
+			if (connections.containsKey(member.getId())) {
+				connections.get(member.getId()).sendMessage(new TextMessage(mapper.writeValueAsString(msg)));
+			}
+			else {
+				unConnectedMember.add(member);
+			}
 		}
 	}
 }

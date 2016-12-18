@@ -15,14 +15,33 @@ export default class App extends React.Component {
 		super(props);
 
 		this.state = {
-			childrenData : null
+			childrenData : null,
+			ws : null
 		};
+
+		this.onWebSocketClientOpen = this.onWebSocketClientOpen.bind(this);
+		this.needWebSocketClientClose = this.needWebSocketClientClose.bind(this);
 	}
 
 	componentWillUnmount() {
 		if (this.serverRequest) {
 			this.serverRequest.abort();
 		}
+	}
+
+	onReceiveMessage(message) {
+	}
+
+	onWebSocketClientOpen(ws) {
+		ws.onMessage = this.onReceiveMessage;
+
+		this.setState({
+			ws : ws
+		});
+	}
+
+	needWebSocketClientClose() {
+		this.state.ws.close();
 	}
 
 	render() {
@@ -34,8 +53,9 @@ export default class App extends React.Component {
 		}
 		return (
 			<div>
-				<Header />
-				{React.cloneElement(this.props.children, {childrenData: this.state.childrenData})}
+				<Header
+				 	onOpen={this.onWebSocketClientOpen} onClose={this.needWebSocketClientClose}/>
+				{React.cloneElement(this.props.children, {ws: this.state.ws})}
 			</div>
 		);
 	}

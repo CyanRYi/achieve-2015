@@ -10,4 +10,5 @@ public interface MessageService {
 	
 	public Page<Message> getMessages(UUID roomId, Pageable page) throws Exception;
 
+	public Message saveMessage(Message message);
 }

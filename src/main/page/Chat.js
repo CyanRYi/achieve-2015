@@ -12,19 +12,23 @@ export default class Chat extends React.Component {
 	constructor(props) {
 		super(props);
 
+		if (!this.props.ws) {
+			location.href='/';
+		}
+		
 		this.state = {
-			client : null,
-			readyState : 3,
 			data : [],
-			members : []
+			members : [],
+			legacyOnMessage : this.props.ws.onMessage
 		};
+
+		console.log(this.props.ws.onMessage);
 
 		this.bindData = this.bindData.bind(this);
 		this.retrieveData = this.retrieveData.bind(this);
 		this.onReceiveMessage = this.onReceiveMessage.bind(this);
 		this.closeChat = this.closeChat.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
-		this.connectStateChange = this.connectStateChange.bind(this);
 	}
 
 	componentWillMount() {
@@ -32,61 +36,30 @@ export default class Chat extends React.Component {
 	}
 
 	componentWillUnmount() {
-		let client = this.state.client;
-		let request = this.serverRequest;
+		let me = this;
 
-		var _promiseClientClose = new Promise(function(resolve, reject) {
-			client.onClose = console.log;
-			client.close();
+		var _promiseRollbackOnMessage = new Promise(function(resolve, reject) {
+			me.props.ws.onMessage = me.state.legacyOnMessage;
 		});
 
 		var _promiseRequestAbort = new Promise(function(resolve, reject) {
-			if (request) {
-				request.abort();
+			if (me.serverRequest) {
+				me.serverRequest.abort();
 			}
 		});
 
 		Promise.all([
-			_promiseClientClose,
+			_promiseRollbackOnMessage,
 			_promiseRequestAbort
 		]).then(this.props.closeChat, function(error) {console.log(error)});
 	}
 
 	componentDidMount() {
-		var ws;
-
-		if (this.state.client) {
-			ws = this.state.client;
-		}
-		else {
-			ws = new WebSocketClient("ws://localhost:9000/room");
-		}
-
-		let stateChangeFunc = this.connectStateChange;
-
-		ws.onOpen = function(event) {
-			stateChangeFunc(ws.readyState);
+		let me = this;
+		this.props.ws.onMessage = function(message) {
+			me.state.legacyOnMessage(message);
+			me.onReceiveMessage(message);
 		};
-
-		ws.onClose = function(event) {
-			stateChangeFunc(ws.readyState);
-		};
-
-		ws.onError = function(event) {
-			stateChangeFunc(ws.readyState);
-		};
-
-		ws.onMessage = this.onReceiveMessage;
-
-		this.setState({
-			client : ws
-		});
-	}
-
-	connectStateChange(state) {
-		this.setState({
-			readyState : state
-		});
 	}
 
 	onReceiveMessage(response) {
@@ -155,14 +128,13 @@ export default class Chat extends React.Component {
 	}
 
 	handleSubmit(value) {
-		this.state.client.send(JSON.stringify({
+		this.props.ws.send(JSON.stringify({
 			roomId : this.props.roomId,
 			content : value
 		}));
 	}
 
 	closeChat() {
-		this.state.client.close();
 		this.props.closeChat();
 	}
 
@@ -178,14 +150,12 @@ export default class Chat extends React.Component {
 					{this.state.data.map((obj, i) => {
 						let myMessage = obj.sendedBy == auth.userId;
 						return (
-							<div>
 							<Message isMine={myMessage} content={obj.content} key={i} sendedAt={obj.sendedAt}
 								name={this.state.members.filter(m => m.id == obj.sendedBy)[0].name} />
-							</div>
 						);
 					})}
 				</div>
-				<div container={this}>
+				<div>
 					<ChatFooter onSubmit={this.handleSubmit} />
 				</div>
 			</div>
