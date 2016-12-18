@@ -38,6 +38,8 @@ public class AccountServiceImpl implements AccountService {
 		dto.setPassword(passwordEncoder.encode(dto.getPassword()));
 		Account account = new Account(dto);
 		
+		accountRepo.save(account);
+		
 		//테스트용 더미
 		account.addFriend(1);
 		
