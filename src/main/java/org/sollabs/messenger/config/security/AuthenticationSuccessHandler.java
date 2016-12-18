@@ -25,7 +25,6 @@ public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccess
 	@Override
 	@Transactional
 	public void onAuthenticationSuccess(HttpServletRequest req, HttpServletResponse resp, Authentication auth) throws IOException, ServletException {
-		System.err.println("Success");
 		String email = req.getParameter("email");
 		//String signinIpAddr = req.getRemoteAddr();
 		

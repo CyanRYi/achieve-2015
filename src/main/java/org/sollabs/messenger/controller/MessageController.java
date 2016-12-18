@@ -22,8 +22,6 @@ public class MessageController {
 	
 	@GetMapping("/{id}")
 	public Page<Message> getMessages(@PathVariable UUID id, Pageable page, SystemAuthentication auth) throws Exception {
-		System.out.println(page);
-		System.out.println(id);
 		return messageService.getMessages(id, page);
 	}
 }
