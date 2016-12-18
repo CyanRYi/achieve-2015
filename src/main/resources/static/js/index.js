@@ -27893,7 +27893,7 @@
 		}, {
 			key: 'componentDidMount',
 			value: function componentDidMount() {
-				var ws = new _WebSocketClient2.default("ws://127.0.0.1:9000/connect");
+				var ws = new _WebSocketClient2.default("ws://52.78.6.211:9000/connect");
 
 				var me = this;
 
