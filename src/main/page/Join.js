@@ -61,10 +61,17 @@ export default class Join extends React.Component {
 				}
 			}
 		}
+		var emailRegex = /^(([a-zA-Z]|[0-9])|([-]|[_]|[.]))+[@](([a-zA-Z0-9])|([-])){2,63}[.](([a-zA-Z0-9]){2,63})+$/gi;
+
+		if (!emailRegex.test(this.state.email)) {
+			this.setState({validationMessage : '잘못된 이메일 양식입니다.'});
+			return false;
+		}
 		return true;
 	}
 
 	handleSubmit() {
+		console.log(this.state);
 		if (!this.validate()) {
 			return;
 		}
