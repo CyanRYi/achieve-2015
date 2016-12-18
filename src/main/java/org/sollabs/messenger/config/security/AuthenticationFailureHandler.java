@@ -25,7 +25,8 @@ public class AuthenticationFailureHandler extends SimpleUrlAuthenticationFailure
 	@Override
 	@Transactional
 	public void onAuthenticationFailure(HttpServletRequest req, HttpServletResponse resp, AuthenticationException ex) throws IOException, ServletException {
-		String email = req.getParameter("username");
+		System.err.println("Failed");
+		String email = req.getParameter("email");
 		
 		Account failedAccount = accountRepo.findByEmail(email);
 		
@@ -34,7 +35,6 @@ public class AuthenticationFailureHandler extends SimpleUrlAuthenticationFailure
 			accountRepo.save(failedAccount);
 		}
 		
-		super.setDefaultFailureUrl("/signin?error");
 		super.onAuthenticationFailure(req, resp, ex);
 	}
 }

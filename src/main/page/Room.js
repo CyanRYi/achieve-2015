@@ -97,8 +97,8 @@ export default class Room extends React.Component {
 		if (this.state.roomId) {
 			return (
 				<Chat
-					roomId={this.state.roomId}
-					closeChat={this.closeChat} />
+					roomId={this.state.roomId} closeChat={this.closeChat}
+					onKeyPress={this.handleKeyEvent} />
 			);
 		}
 		else {

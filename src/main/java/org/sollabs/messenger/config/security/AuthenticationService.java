@@ -20,8 +20,10 @@ public class AuthenticationService implements UserDetailsService {
 	
 	@Override
 	@Transactional
-	public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-		Account account = accountRepo.findByEmail(userName);
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+		
+		System.out.println("-" + email);
+		Account account = accountRepo.findByEmail(email);
 		
 		if (account == null) {
 			throw new UsernameNotFoundException("존재하지 않는 아이디");

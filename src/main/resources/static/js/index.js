@@ -62,10 +62,6 @@
 
 	var _reactRouter = __webpack_require__(183);
 
-	var _WebSocketClient = __webpack_require__(246);
-
-	var _WebSocketClient2 = _interopRequireDefault(_WebSocketClient);
-
 	var _Header = __webpack_require__(247);
 
 	var _Header2 = _interopRequireDefault(_Header);
@@ -81,6 +77,14 @@
 	var _MyInfo = __webpack_require__(509);
 
 	var _MyInfo2 = _interopRequireDefault(_MyInfo);
+
+	var _SignIn = __webpack_require__(514);
+
+	var _SignIn2 = _interopRequireDefault(_SignIn);
+
+	var _Join = __webpack_require__(515);
+
+	var _Join2 = _interopRequireDefault(_Join);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -99,15 +103,8 @@
 			var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
 
 			_this.state = {
-				client: null,
-				connectState: 3,
-				hasNewMessage: false,
-				message: [],
 				childrenData: null
 			};
-
-			_this.connectStateChange = _this.connectStateChange.bind(_this);
-			_this.onReceiveMessage = _this.onReceiveMessage.bind(_this);
 			return _this;
 		}
 
@@ -117,63 +114,20 @@
 				if (this.serverRequest) {
 					this.serverRequest.abort();
 				}
-
-				this.state.client.close();
-			}
-		}, {
-			key: 'componentDidMount',
-			value: function componentDidMount() {
-				var ws;
-
-				if (this.state.client) {
-					ws = this.state.client;
-				} else {
-					ws = new _WebSocketClient2.default("ws://localhost:9000/connect");
-				}
-
-				var stateChangeFunc = this.connectStateChange;
-
-				ws.onOpen = function (event) {
-					stateChangeFunc(ws.readyState);
-				};
-
-				ws.onClose = function (event) {
-					stateChangeFunc(ws.readyState);
-				};
-
-				ws.onError = function (event) {
-					stateChangeFunc(ws.readyState);
-				};
-
-				ws.onMessage = this.onReceiveMessage;
-
-				this.setState({
-					client: ws
-				});
-			}
-		}, {
-			key: 'connectStateChange',
-			value: function connectStateChange(state) {
-				this.setState({
-					connectState: state
-				});
-			}
-		}, {
-			key: 'onReceiveMessage',
-			value: function onReceiveMessage(message) {
-				this.setState({
-					hasNewMessage: true
-				});
 			}
 		}, {
 			key: 'render',
 			value: function render() {
+				if (auth.principal === 'anonymousUser') {
+					if (this.props.location.pathname === '/join') {
+						return _react2.default.createElement(_Join2.default, null);
+					}
+					return _react2.default.createElement(_SignIn2.default, null);
+				}
 				return _react2.default.createElement(
 					'div',
 					null,
-					_react2.default.createElement(_Header2.default, {
-						state: this.state.connectState,
-						'new': this.state.hasNewMessage }),
+					_react2.default.createElement(_Header2.default, null),
 					_react2.default.cloneElement(this.props.children, { childrenData: this.state.childrenData })
 				);
 			}
@@ -194,7 +148,9 @@
 			_react2.default.createElement(_reactRouter.IndexRoute, { component: _Friend2.default }),
 			_react2.default.createElement(_reactRouter.Route, { path: '/myInfo', component: _MyInfo2.default }),
 			_react2.default.createElement(_reactRouter.Route, { path: '/users', component: _Friend2.default }),
-			_react2.default.createElement(_reactRouter.Route, { path: '/rooms(/:childrenData)', component: _Room2.default })
+			_react2.default.createElement(_reactRouter.Route, { path: '/rooms(/:childrenData)', component: _Room2.default }),
+			_react2.default.createElement(_reactRouter.Route, { path: '/join', component: _Join2.default }),
+			_react2.default.createElement(_reactRouter.Route, { path: '/signin', component: _SignIn2.default })
 		)
 	), document.getElementById('app'));
 
@@ -27935,6 +27891,10 @@
 
 	var _reactRouterBootstrap = __webpack_require__(501);
 
+	var _WebSocketClient = __webpack_require__(246);
+
+	var _WebSocketClient2 = _interopRequireDefault(_WebSocketClient);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -27949,13 +27909,74 @@
 		function Header(props) {
 			_classCallCheck(this, Header);
 
-			return _possibleConstructorReturn(this, (Header.__proto__ || Object.getPrototypeOf(Header)).call(this, props));
+			var _this = _possibleConstructorReturn(this, (Header.__proto__ || Object.getPrototypeOf(Header)).call(this, props));
+
+			_this.state = {
+				client: null,
+				readtState: 3,
+				hasNewMessage: false,
+				message: []
+			};
+
+			_this.connectStateChange = _this.connectStateChange.bind(_this);
+			_this.onReceiveMessage = _this.onReceiveMessage.bind(_this);
+			return _this;
 		}
 
 		_createClass(Header, [{
+			key: 'componentWillUnmount',
+			value: function componentWillUnmount() {
+				this.state.client.close();
+			}
+		}, {
+			key: 'connectStateChange',
+			value: function connectStateChange(state) {
+				this.setState({
+					readtState: state
+				});
+			}
+		}, {
+			key: 'onReceiveMessage',
+			value: function onReceiveMessage(message) {
+				this.setState({
+					hasNewMessage: true
+				});
+			}
+		}, {
+			key: 'componentDidMount',
+			value: function componentDidMount() {
+				var ws;
+
+				if (this.state.client) {
+					ws = this.state.client;
+				} else {
+					ws = new _WebSocketClient2.default("ws://localhost:9000/connect");
+				}
+
+				var stateChangeFunc = this.connectStateChange;
+
+				ws.onOpen = function (event) {
+					stateChangeFunc(ws.readyState);
+				};
+
+				ws.onClose = function (event) {
+					stateChangeFunc(ws.readyState);
+				};
+
+				ws.onError = function (event) {
+					stateChangeFunc(ws.readyState);
+				};
+
+				ws.onMessage = this.onReceiveMessage;
+
+				this.setState({
+					client: ws
+				});
+			}
+		}, {
 			key: 'getConnectState',
 			value: function getConnectState() {
-				switch (this.props.state) {
+				switch (this.state.readyState) {
 					case 1:
 						return 'green';
 					case 3:
@@ -28017,7 +28038,7 @@
 							{ pullRight: true },
 							_react2.default.createElement(
 								_reactBootstrap.NavDropdown,
-								{ title: username, id: 'personal-nav-menu-dropdown' },
+								{ title: auth.userName, id: 'personal-nav-menu-dropdown' },
 								_react2.default.createElement(
 									_reactRouterBootstrap.LinkContainer,
 									{ to: '/myInfo' },
@@ -47968,8 +47989,8 @@
 
 				if (this.state.roomId) {
 					return _react2.default.createElement(_Chat2.default, {
-						roomId: this.state.roomId,
-						closeChat: this.closeChat });
+						roomId: this.state.roomId, closeChat: this.closeChat,
+						onKeyPress: this.handleKeyEvent });
 				} else {
 					return _react2.default.createElement(
 						'div',
@@ -48126,7 +48147,6 @@
 		}, {
 			key: 'componentWillUnmount',
 			value: function componentWillUnmount() {
-
 				var client = this.state.client;
 				var request = this.serverRequest;
 
@@ -48213,7 +48233,7 @@
 				});
 
 				var promiseMessage = new Promise(function (resolve, reject) {
-					AJAX.call('./messages?page=0&size=10&roomId=' + roomId, 'GET', resolve, reject);
+					AJAX.call('./messages/' + roomId + '?page=0&size=10&sort=sendedAt,desc', 'GET', resolve, reject);
 				});
 
 				promiseMember.then(function (response) {
@@ -48236,7 +48256,7 @@
 				var result = JSON.parse(response);
 
 				this.setState({
-					data: result.content
+					data: result.content.reverse()
 				});
 
 				this.focusToNewMessage();
@@ -48272,18 +48292,24 @@
 					{ style: { height: "85%" } },
 					_react2.default.createElement(
 						'div',
-						{ container: this },
-						_react2.default.createElement(_ChatHeader2.default, { state: this.state.readyState, handleClose: this.closeChat })
+						null,
+						_react2.default.createElement(_ChatHeader2.default, {
+							state: this.state.readyState, handleClose: this.closeChat,
+							members: this.state.members })
 					),
 					_react2.default.createElement(
 						'div',
 						{ id: 'messages', style: { height: "90%", overflow: "auto" } },
 						this.state.data.map(function (obj, i) {
-							var myMessage = obj.sendedBy == userId;
-							return _react2.default.createElement(_Message2.default, { isMine: myMessage, content: obj.content, key: i,
-								name: _this2.state.members.filter(function (m) {
-									return m.id == obj.sendedBy;
-								})[0].name });
+							var myMessage = obj.sendedBy == auth.userId;
+							return _react2.default.createElement(
+								'div',
+								null,
+								_react2.default.createElement(_Message2.default, { isMine: myMessage, content: obj.content, key: i, sendedAt: obj.sendedAt,
+									name: _this2.state.members.filter(function (m) {
+										return m.id == obj.sendedBy;
+									})[0].name })
+							);
 						})
 					),
 					_react2.default.createElement(
@@ -48406,14 +48432,14 @@
 					if (event.target.value.length > 50) {
 						return;
 					}
-					this.setState(_defineProperty({}, event.target.id, event.target.value));
 				}
+				this.setState(_defineProperty({}, event.target.id, event.target.value));
 			}
 		}, {
 			key: 'handleSubmit',
 			value: function handleSubmit() {
 				var params = {
-					id: userId,
+					id: auth.userId,
 					name: this.state.name,
 					comment: this.state.comment
 				};
@@ -48801,17 +48827,31 @@
 	  }, {
 	    key: 'render',
 	    value: function render() {
+	      var memberNames = [];
+	      this.props.members.map(function (obj) {
+	        memberNames.push(obj.name);
+	      });
 	      return _react2.default.createElement(
 	        'div',
-	        { style: { height: "30px" } },
+	        { style: { height: "40px", backgroundColor: "#4ABFD3" } },
 	        _react2.default.createElement(
 	          'span',
-	          { className: "pull-left", style: { color: this.getConnectState() } },
+	          { className: 'pull-left',
+	            style: { fontSize: '200%', color: this.getConnectState(), height: '40px' } },
 	          '\u25CF'
 	        ),
 	        _react2.default.createElement(
+	          'span',
+	          { className: 'pull-left', style: { fontSize: '150%' } },
+	          _react2.default.createElement(
+	            'strong',
+	            null,
+	            memberNames.toString()
+	          )
+	        ),
+	        _react2.default.createElement(
 	          _reactBootstrap.Button,
-	          { className: 'pull-right', bsSize: 'xsmall', onClick: this.props.handleClose },
+	          { className: 'pull-right', style: { height: '40px', width: '40px' }, onClick: this.props.handleClose },
 	          _react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'remove' })
 	        )
 	      );
@@ -48867,6 +48907,7 @@
 
 	    _this.handleChange = _this.handleChange.bind(_this);
 	    _this.handleSubmit = _this.handleSubmit.bind(_this);
+	    _this.handleKeyEvent = _this.handleKeyEvent.bind(_this);
 	    return _this;
 	  }
 
@@ -48890,6 +48931,13 @@
 	      });
 	    }
 	  }, {
+	    key: 'handleKeyEvent',
+	    value: function handleKeyEvent(event) {
+	      if (event.key === "Enter") {
+	        this.handleSubmit();
+	      }
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      return _react2.default.createElement(
@@ -48898,7 +48946,8 @@
 	        _react2.default.createElement(
 	          _reactBootstrap.InputGroup,
 	          { style: { width: "100%" } },
-	          _react2.default.createElement(_reactBootstrap.FormControl, { autoFocus: true, value: this.state.value, onChange: this.handleChange }),
+	          _react2.default.createElement(_reactBootstrap.FormControl, { autoFocus: true,
+	            value: this.state.value, onChange: this.handleChange, onKeyPress: this.handleKeyEvent }),
 	          _react2.default.createElement(
 	            _reactBootstrap.InputGroup.Button,
 	            null,
@@ -48952,14 +49001,22 @@
 
 	    var _this = _possibleConstructorReturn(this, (Message.__proto__ || Object.getPrototypeOf(Message)).call(this, props));
 
-	    _this.state = {};
+	    _this.getFormattedDate = _this.getFormattedDate.bind(_this);
 	    return _this;
 	  }
 
 	  _createClass(Message, [{
+	    key: 'getFormattedDate',
+	    value: function getFormattedDate() {
+	      var sendedAt = new Date(this.props.sendedAt);
+
+	      return sendedAt.getMonth() + 1 + '/' + sendedAt.getDate() + ' ' + sendedAt.getHours() + ':' + sendedAt.getMinutes();
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      var pullClass = this.props.isMine ? 'pull-right' : 'pull-left';
+
 	      return _react2.default.createElement(
 	        'div',
 	        { style: { width: "100%" } },
@@ -48980,6 +49037,11 @@
 	            _reactBootstrap.Well,
 	            { style: { width: "80%" }, className: pullClass },
 	            this.props.content
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: pullClass },
+	            this.getFormattedDate()
 	          )
 	        )
 	      );
@@ -48990,6 +49052,316 @@
 	}(_react2.default.Component);
 
 	exports.default = Message;
+
+/***/ },
+/* 514 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _Ajax = __webpack_require__(505);
+
+	var _Ajax2 = _interopRequireDefault(_Ajax);
+
+	var _reactRouterBootstrap = __webpack_require__(501);
+
+	var _reactBootstrap = __webpack_require__(248);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var SignIn = function (_React$Component) {
+		_inherits(SignIn, _React$Component);
+
+		function SignIn(props) {
+			_classCallCheck(this, SignIn);
+
+			var _this = _possibleConstructorReturn(this, (SignIn.__proto__ || Object.getPrototypeOf(SignIn)).call(this, props));
+
+			_this.state = {
+				email: '',
+				password: ''
+			};
+
+			_this.handleChange = _this.handleChange.bind(_this);
+			_this.handleSubmit = _this.handleSubmit.bind(_this);
+			return _this;
+		}
+
+		_createClass(SignIn, [{
+			key: 'componentWillUnmount',
+			value: function componentWillUnmount() {
+				if (this.serverRequest) {
+					this.serverRequest.abort();
+				}
+			}
+		}, {
+			key: 'handleChange',
+			value: function handleChange(event) {
+				if (event.target.id === 'email') {
+					if (event.target.value.length > 50) {
+						return;
+					}
+				}
+				this.setState(_defineProperty({}, event.target.id, event.target.value));
+			}
+		}, {
+			key: 'handleSubmit',
+			value: function handleSubmit() {
+				var metaTags = document.getElementsByTagName("meta");
+
+				var csrfToken;
+				var csrfHeader;
+
+				for (var counter = 0; counter < metaTags.length; counter++) {
+					if (metaTags[counter].getAttribute('name') == '_csrf') {
+						csrfToken = metaTags[counter].content;
+					}
+					if (metaTags[counter].getAttribute('name') == '_csrf_header') {
+						csrfHeader = metaTags[counter].content;
+					}
+				}
+
+				var xhr = new XMLHttpRequest();
+				xhr.open('POST', '/sign-in-process');
+				xhr.setRequestHeader(csrfHeader, csrfToken);
+				xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				xhr.onreadystatechange = function () {
+					if (xhr.readyState == 4) {
+						if (xhr.status == 200) {
+							location.href = "/";
+						} else {
+							console.log(xhr);
+						}
+					}
+				};
+				xhr.send("email=" + this.state.email + "&password=" + this.state.password);
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				return _react2.default.createElement(
+					_reactBootstrap.Col,
+					{ smOffset: 3, sm: 6 },
+					_react2.default.createElement(
+						_reactBootstrap.Panel,
+						{ header: 'Please Sign In', style: { marginTop: '50px' } },
+						_react2.default.createElement(
+							_reactBootstrap.Form,
+							null,
+							_react2.default.createElement(_reactBootstrap.FormControl, { autoFocus: true,
+								id: 'email', placeholder: 'E-mail', type: 'text',
+								value: this.state.email, onChange: this.handleChange }),
+							_react2.default.createElement(_reactBootstrap.FormControl, {
+								id: 'password', type: 'password', placeholder: 'Password',
+								value: this.state.password, onChange: this.handleChange })
+						),
+						_react2.default.createElement(
+							_reactBootstrap.Button,
+							{ bsStyle: 'primary', bsSize: 'large', block: true, onClick: this.handleSubmit },
+							'Sign In'
+						),
+						_react2.default.createElement(
+							_reactBootstrap.ButtonGroup,
+							{ justified: true },
+							_react2.default.createElement(
+								_reactRouterBootstrap.LinkContainer,
+								{ to: '/join' },
+								_react2.default.createElement(
+									_reactBootstrap.Button,
+									{ bsSize: 'small' },
+									'Join'
+								)
+							),
+							_react2.default.createElement(
+								_reactBootstrap.Button,
+								{ href: '#', bsSize: 'small', onClick: function onClick() {
+										return console.log("join");
+									} },
+								'Forgot Password?'
+							)
+						)
+					)
+				);
+			}
+		}]);
+
+		return SignIn;
+	}(_react2.default.Component);
+
+	exports.default = SignIn;
+
+/***/ },
+/* 515 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _Ajax = __webpack_require__(505);
+
+	var _Ajax2 = _interopRequireDefault(_Ajax);
+
+	var _reactRouterBootstrap = __webpack_require__(501);
+
+	var _reactBootstrap = __webpack_require__(248);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Join = function (_React$Component) {
+		_inherits(Join, _React$Component);
+
+		function Join(props) {
+			_classCallCheck(this, Join);
+
+			var _this = _possibleConstructorReturn(this, (Join.__proto__ || Object.getPrototypeOf(Join)).call(this, props));
+
+			_this.state = {
+				email: '',
+				name: '',
+				password: '',
+				passwordRepeat: ''
+			};
+
+			_this.handleChange = _this.handleChange.bind(_this);
+			_this.handleSubmit = _this.handleSubmit.bind(_this);
+			return _this;
+		}
+
+		_createClass(Join, [{
+			key: 'componentWillUnmount',
+			value: function componentWillUnmount() {
+				if (this.serverRequest) {
+					this.serverRequest.abort();
+				}
+			}
+		}, {
+			key: 'handleChange',
+			value: function handleChange(event) {
+				if (event.target.id === 'email') {
+					if (event.target.value.length > 50) return;
+				} else if (event.target.id === 'name') {
+					if (event.target.value.length > 20) return;
+				} else if (event.target.id === 'comment') {
+					if (event.target.value.length > 50) return;
+				}
+
+				this.setState(_defineProperty({}, event.target.id, event.target.value));
+			}
+		}, {
+			key: 'handleSubmit',
+			value: function handleSubmit() {
+				var params = {
+					email: this.state.email,
+					name: this.state.name,
+					password: this.state.password,
+					passwordRepeat: this.state.passwordRepeat
+				};
+
+				this.sendProxyRequest('/users', 'POST', function () {
+					location.href = '/';
+				}, console.log, params);
+			}
+		}, {
+			key: 'sendProxyRequest',
+			value: function sendProxyRequest(url, method, success, error, requestParam) {
+				var AJAX = new _Ajax2.default();
+
+				AJAX.call(url, method, success, error, requestParam);
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				return _react2.default.createElement(
+					_reactBootstrap.Col,
+					{ smOffset: 3, sm: 6 },
+					_react2.default.createElement(
+						_reactBootstrap.Panel,
+						{ header: 'Sign On', style: { marginTop: '50px' } },
+						_react2.default.createElement(
+							_reactBootstrap.Form,
+							null,
+							_react2.default.createElement(_reactBootstrap.FormControl, { autoFocus: true,
+								id: 'email', placeholder: 'E-mail', type: 'text',
+								value: this.state.email, onChange: this.handleChange }),
+							_react2.default.createElement(_reactBootstrap.FormControl, {
+								id: 'name', placeholder: 'Name', type: 'text',
+								value: this.state.name, onChange: this.handleChange }),
+							_react2.default.createElement(_reactBootstrap.FormControl, {
+								id: 'password', type: 'password', placeholder: 'Password',
+								value: this.state.password, onChange: this.handleChange }),
+							_react2.default.createElement(_reactBootstrap.FormControl, {
+								id: 'passwordRepeat', type: 'password', placeholder: 'Password Repeat',
+								value: this.state.passwordRepeat, onChange: this.handleChange })
+						),
+						_react2.default.createElement(
+							_reactBootstrap.Button,
+							{ bsStyle: 'primary', bsSize: 'large', block: true, onClick: this.handleSubmit },
+							'Sign On'
+						),
+						_react2.default.createElement(
+							_reactBootstrap.ButtonGroup,
+							{ justified: true },
+							_react2.default.createElement(
+								_reactRouterBootstrap.LinkContainer,
+								{ to: '/signin' },
+								_react2.default.createElement(
+									_reactBootstrap.Button,
+									{ bsSize: 'small' },
+									'Sign In'
+								)
+							),
+							_react2.default.createElement(
+								_reactBootstrap.Button,
+								{ href: '#', bsSize: 'small', onClick: function onClick() {
+										return console.log("join");
+									} },
+								'Forgot Password?'
+							)
+						)
+					)
+				);
+			}
+		}]);
+
+		return Join;
+	}(_react2.default.Component);
+
+	exports.default = Join;
 
 /***/ }
 /******/ ]);

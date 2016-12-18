@@ -2,14 +2,73 @@ import React from 'react';
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem, Badge } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import WebSocketClient from '../component/WebSocketClient.js'
+
 export default class Header extends React.Component {
 
 	constructor(props) {
 		super(props);
+
+		this.state = {
+			client : null,
+			readtState : 3,
+			hasNewMessage : false,
+			message : []
+		};
+
+		this.connectStateChange = this.connectStateChange.bind(this);
+		this.onReceiveMessage = this.onReceiveMessage.bind(this);
+	}
+
+	componentWillUnmount() {
+		this.state.client.close();
+	}
+
+	connectStateChange(state) {
+		this.setState({
+			readtState : state
+		});
+	}
+
+	onReceiveMessage(message) {
+		this.setState({
+			hasNewMessage : true
+		});
+	}
+
+	componentDidMount() {
+		var ws;
+
+		if (this.state.client) {
+			ws = this.state.client;
+		}
+		else {
+			ws = new WebSocketClient("ws://localhost:9000/connect");
+		}
+
+		let stateChangeFunc = this.connectStateChange;
+
+		ws.onOpen = function(event) {
+			stateChangeFunc(ws.readyState);
+		};
+
+		ws.onClose = function(event) {
+			stateChangeFunc(ws.readyState);
+		};
+
+		ws.onError = function(event) {
+			stateChangeFunc(ws.readyState);
+		};
+
+		ws.onMessage = this.onReceiveMessage;
+
+		this.setState({
+			client : ws
+		});
 	}
 
 	getConnectState() {
-		switch (this.props.state) {
+		switch (this.state.readyState) {
 			case 1: return 'green';
 			case 3: return 'red';
 			default: return 'yellow';
@@ -35,8 +94,8 @@ export default class Header extends React.Component {
 						</LinkContainer>
 					</Nav>
 					<Nav pullRight>
-						<NavDropdown title={username} id="personal-nav-menu-dropdown">
-						<LinkContainer to="/myInfo"><MenuItem>개인정보수정</MenuItem></LinkContainer>
+						<NavDropdown title={auth.userName} id="personal-nav-menu-dropdown">
+							<LinkContainer to="/myInfo"><MenuItem>개인정보수정</MenuItem></LinkContainer>
 				      <MenuItem href="/signout">로그아웃</MenuItem>
 						</NavDropdown>
 					</Nav>

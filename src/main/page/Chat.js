@@ -32,7 +32,6 @@ export default class Chat extends React.Component {
 	}
 
 	componentWillUnmount() {
-
 		let client = this.state.client;
 		let request = this.serverRequest;
 
@@ -116,7 +115,7 @@ export default class Chat extends React.Component {
 		});
 
 		var promiseMessage = new Promise(function (resolve, reject) {
-			AJAX.call('./messages?page=0&size=10&roomId=' + roomId, 'GET', resolve, reject);
+			AJAX.call('./messages/' + roomId + '?page=0&size=10&sort=sendedAt,desc', 'GET', resolve, reject);
 		});
 
 		promiseMember.then(
@@ -143,7 +142,7 @@ export default class Chat extends React.Component {
 		let result = JSON.parse(response);
 
 		this.setState({
-			data : result.content
+			data : result.content.reverse()
 		});
 
 		this.focusToNewMessage();
@@ -170,14 +169,20 @@ export default class Chat extends React.Component {
 	render() {
 		return (
 			<div style={{height:"85%"}}>
-				<div container={this}>
-					<ChatHeader state={this.state.readyState} handleClose={this.closeChat} />
+				<div>
+					<ChatHeader
+						state={this.state.readyState} handleClose={this.closeChat}
+						members={this.state.members} />
 				</div>
 				<div id="messages" style={{height:"90%", overflow:"auto"}}>
 					{this.state.data.map((obj, i) => {
-						let myMessage = obj.sendedBy == userId;
-						return (<Message isMine={myMessage} content={obj.content} key={i}
-							name={this.state.members.filter(m => m.id == obj.sendedBy)[0].name} />);
+						let myMessage = obj.sendedBy == auth.userId;
+						return (
+							<div>
+							<Message isMine={myMessage} content={obj.content} key={i} sendedAt={obj.sendedAt}
+								name={this.state.members.filter(m => m.id == obj.sendedBy)[0].name} />
+							</div>
+						);
 					})}
 				</div>
 				<div container={this}>

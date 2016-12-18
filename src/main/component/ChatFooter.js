@@ -12,6 +12,7 @@ export default class ChatFooter extends React.Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleKeyEvent = this.handleKeyEvent.bind(this);
   }
 
   handleChange(event) {
@@ -31,11 +32,18 @@ export default class ChatFooter extends React.Component {
     })
   }
 
+  handleKeyEvent(event) {
+    if (event.key === "Enter") {
+        this.handleSubmit();
+    }
+  }
+
   render() {
     return (
       <FormGroup>
         <InputGroup style={{width:"100%"}}>
-          <FormControl autoFocus value={this.state.value} onChange={this.handleChange}/>
+          <FormControl autoFocus
+            value={this.state.value} onChange={this.handleChange} onKeyPress={this.handleKeyEvent}/>
           <InputGroup.Button>
             <Button onClick={this.handleSubmit}>전송</Button>
           </InputGroup.Button>

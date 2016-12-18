@@ -59,7 +59,7 @@ public class Account {
 	private String name;
 	
 	@Column(table="profile", length=50)
-	private String comment = "";
+	private String comment;
 	
 	@Column(table="profile")
 	@Lob

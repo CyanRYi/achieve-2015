@@ -63,16 +63,15 @@ export default class MyInfo extends React.Component {
 			if (event.target.value.length > 50) {
 				return;
 			}
-			this.setState({
-				[event.target.id] : event.target.value
-			});
 		}
-
+		this.setState({
+			[event.target.id] : event.target.value
+		});
 	}
 
 	handleSubmit() {
 		let params = {
-			id : userId,
+			id : auth.userId,
 			name : this.state.name,
 			comment : this.state.comment
 		}

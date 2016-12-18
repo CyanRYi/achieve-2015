@@ -18,6 +18,10 @@ public class AuthenticationProvider extends DaoAuthenticationProvider {
 	@Override
 	public Authentication createSuccessAuthentication(Object principal, Authentication authentication,
 			UserDetails user) {
+		
+		System.out.println(user);
+		System.out.println(principal);
+		System.out.println(authentication);
 		SystemAuthentication result = new SystemAuthentication(authentication.getPrincipal(), authentication.getCredentials(),
 				user.getAuthorities(), obtainUserId(user), obtainUserName(user));
 		result.setDetails(authentication.getDetails());

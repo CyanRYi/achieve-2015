@@ -17,10 +17,16 @@ export default class ChatHeader extends React.Component {
 	}
 
   render() {
+    let memberNames = [];
+    this.props.members.map((obj) => {memberNames.push(obj.name);});
     return (
-      <div style={{height:"30px"}}>
-        <span className={"pull-left"} style={{color : this.getConnectState()}}>●</span>
-        <Button className="pull-right" bsSize="xsmall" onClick={this.props.handleClose}>
+      <div style={{height:"40px", backgroundColor:"#4ABFD3"}}>
+        <span className="pull-left"
+          style={{fontSize: '200%', color : this.getConnectState(), height:'40px'}}>●</span>
+        <span className="pull-left" style={{fontSize:'150%'}}>
+          <strong>{memberNames.toString()}</strong>
+        </span>
+        <Button className="pull-right" style={{height:'40px', width:'40px'}} onClick={this.props.handleClose}>
           <Glyphicon glyph="remove" />
         </Button>
       </div>

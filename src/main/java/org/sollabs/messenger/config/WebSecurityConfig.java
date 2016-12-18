@@ -38,20 +38,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity security) throws Exception {
-		security.authorizeRequests().antMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/h2-console").permitAll();
 		
-		security.authorizeRequests().antMatchers("/signin", "/join").anonymous()
+		security.authorizeRequests()
+			.antMatchers("/", "/css/**", "/js/**", "/images/**", "/webjars/**", "/h2-console").permitAll()
 			.antMatchers(HttpMethod.POST, "/users").anonymous()
-			.anyRequest().authenticated()
-			
-			/* h2-console을 사용하기 위한 보안 우회 설정 */
-			.and().csrf().requireCsrfProtectionMatcher(new AntPathRequestMatcher("!/h2-console/**"))
+			.anyRequest().authenticated();
+		
+		security
+			 //h2-console을 사용하기 위한 보안 우회 설정 
+			.csrf().requireCsrfProtectionMatcher(new AntPathRequestMatcher("!/h2-console/**"))
 			.and().headers().addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy","script-src 'self'")).frameOptions().disable()
-			/* h2-console을 사용하기 위한 보안 우회 설정 */
+			 //h2-console을 사용하기 위한 보안 우회 설정
 			
-			.and().formLogin().loginPage("/signin").loginProcessingUrl("/sign-in-process")
+			.and().formLogin().usernameParameter("email").loginProcessingUrl("/sign-in-process")
 				.successHandler(successHandler).failureHandler(failureHandler)
-			.and().logout()./*logoutUrl("/signout").*/logoutRequestMatcher(new AntPathRequestMatcher("/signout", "GET")).logoutSuccessUrl("/");
+			.and().logout().logoutUrl("/signout")
+				.logoutRequestMatcher(new AntPathRequestMatcher("/signout", "GET")).logoutSuccessUrl("/")
+			.and().exceptionHandling()
+				.authenticationEntryPoint(new org.springframework.boot.autoconfigure.security.Http401AuthenticationEntryPoint("headerValue"));
 	}
 	
 	@Autowired
