@@ -52,7 +52,7 @@ export default class FriendSearchModal extends React.Component {
 		let url = "./friends";
 		let method = 'POST';
 
-    this.sendProxyRequest(url, method, null, null, {id : event.target.value});
+    this.sendProxyRequest(url, method, this.props.addCallback, null, {id : event.target.value});
   }
 
   sendProxyRequest(url, method, success, error, requestParam) {
@@ -79,12 +79,11 @@ export default class FriendSearchModal extends React.Component {
         onHide={this.props.hide}
         dialogClassName="friendSearch">
           <Modal.Header closeButton>
-            <FormControl
+            <FormControl autoFocus
               type="text"
               value={this.state.searchParam}
               placeholder="이름 혹은 이메일"
-              onChange={this.handleChange}
-            />
+              onChange={this.handleChange} />
           </Modal.Header>
           <Modal.Body>
           <Table condensed responsive hover>

@@ -1,7 +1,7 @@
 package org.sollabs.messenger.entity;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -17,6 +17,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SecondaryTable;
 
+import org.hibernate.annotations.DynamicUpdate;
 import org.sollabs.messenger.dto.AccountDTO;
 import org.sollabs.messenger.dto.ProfileDTO;
 
@@ -24,6 +25,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @SecondaryTable(name="profile", pkJoinColumns=@PrimaryKeyJoinColumn(name="id"))
+@DynamicUpdate
 public class Account {
 	
 	public Account() {}
@@ -42,7 +44,7 @@ public class Account {
 	@GeneratedValue
 	private long id;
 	
-	@Column(nullable=false, unique=true, length=50)
+	@Column(updatable=false, nullable=false, unique=true, length=50)
 	private String email;
 	
 	@Column(length=60)
@@ -57,7 +59,7 @@ public class Account {
 	private String name;
 	
 	@Column(table="profile", length=50)
-	private String comment;
+	private String comment = "";
 	
 	@Column(table="profile")
 	@Lob
@@ -107,6 +109,9 @@ public class Account {
 	}
 
 	public Collection<Friend> getMyFriends() {
+		if (this.myFriends == null) {
+			return new HashSet<Friend>();
+		}
 		return myFriends;
 	}
 
@@ -116,7 +121,7 @@ public class Account {
 
 	public void addFriend(long friendId) {
 		if (this.myFriends == null) {
-			this.myFriends = new ArrayList<Friend>();
+			this.myFriends = new HashSet<Friend>();
 		}
 		
 		Friend friend = new Friend(this.id, friendId);
@@ -128,7 +133,7 @@ public class Account {
 	
 	public void addFriend(Friend friend) {
 		if (this.myFriends == null) {
-			this.myFriends = new ArrayList<Friend>();
+			this.myFriends = new HashSet<Friend>();
 		}
 		
 		if (!this.getMyFriends().contains(friend)) {

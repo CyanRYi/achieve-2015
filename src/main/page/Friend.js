@@ -22,6 +22,7 @@ class Friend extends React.Component {
 		this.retrieveData = this.retrieveData.bind(this);
 		this.bindData = this.bindData.bind(this);
 		this.getFriendInfoCallback = this.getFriendInfoCallback.bind(this);
+		this.addFriend = this.addFriend.bind(this);
 		this.removeFriend = this.removeFriend.bind(this);
 		this.openRoom = this.openRoom.bind(this);
 	}
@@ -68,11 +69,27 @@ class Friend extends React.Component {
 		AJAX.call(url, method, success, error, requestParam);
 	}
 
+	addFriend(newFriend){
+		this.getFriendInfoCallback(newFriend);
+	}
+
 	removeFriend(event) {
+		let me = this;
+
 		let url = "./friends";
 		let method = 'DELETE';
 
-		this.sendProxyRequest(url, method, null, null, {id : event.target.value});
+		var removeFriendCallback = function(response) {
+			let friends = me.state.data.slice(0);
+
+			let idx = friends.indexOf(friends.filter(m => m.id == JSON.parse(response).id)[0]);
+			delete friends[idx];
+
+			me.setState({
+				data : friends
+			});
+		}
+		this.sendProxyRequest(url, method, removeFriendCallback, null, {id : event.target.value});
 	}
 
 	bindData(response) {
@@ -132,7 +149,8 @@ class Friend extends React.Component {
 				</Modal>
 				<FriendSearch
 					open={this.state.search}
-					hide={() => this.setState({search : false})} />
+					hide={() => this.setState({search : false})}
+					addCallback={this.addFriend}/>
 				<Table condensed responsive hover>
 					<thead>
 						<tr>
@@ -162,9 +180,6 @@ class Friend extends React.Component {
 											<ButtonGroup>
 												<Button bsSize="xsmall" bsStyle="danger" onClick={this.removeFriend} value={obj['id']}>
 													삭제
-												</Button>
-												<Button bsSize="xsmall" bsStyle="warning" value={obj['id']}>
-													차단
 												</Button>
 											</ButtonGroup> : null
 										}

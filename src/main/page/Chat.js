@@ -32,10 +32,25 @@ export default class Chat extends React.Component {
 	}
 
 	componentWillUnmount() {
-		if (this.serverRequest) {
-			this.serverRequest.abort();
-		}
-		this.state.client.close();
+
+		let client = this.state.client;
+		let request = this.serverRequest;
+
+		var _promiseClientClose = new Promise(function(resolve, reject) {
+			client.onClose = console.log;
+			client.close();
+		});
+
+		var _promiseRequestAbort = new Promise(function(resolve, reject) {
+			if (request) {
+				request.abort();
+			}
+		});
+
+		Promise.all([
+			_promiseClientClose,
+			_promiseRequestAbort
+		]).then(this.props.closeChat, function(error) {console.log(error)});
 	}
 
 	componentDidMount() {
@@ -80,6 +95,13 @@ export default class Chat extends React.Component {
 		this.setState({
 			data : this.state.data.slice(0).concat(message)
 		});
+
+		this.focusToNewMessage();
+	}
+
+	focusToNewMessage() {
+		var element = document.getElementById("messages")	;
+		element.scrollTop = element.scrollHeight - element.clientHeight;
 	}
 
 	retrieveData(page, params) {
@@ -88,24 +110,32 @@ export default class Chat extends React.Component {
 		const AJAX = new Ajax();
 
 		var promiseMember = new Promise(function (resolve, reject) {
-			AJAX.call('./rooms/members/' + roomId, 'GET', resolve, reject);
+			if (roomId) {
+					AJAX.call('./rooms/members/' + roomId, 'GET', resolve, reject);
+			}
 		});
 
-		if (roomId) {
-			promiseMember.then(
-				function(response) {
-					let result = JSON.parse(response);
-					me	.setState({
-						members : result
-					});
-				}, function(error) {
-					console.log(error);
-				}
-			).then(AJAX.call('./messages?page=0&size=10&roomId=' + roomId, 'GET', this.bindData, console.log));
-		}
-		else {
-			AJAX.call('./messages?page=0&size=10&roomId=' + roomId, 'GET', this.bindData, reject);
-		}
+		var promiseMessage = new Promise(function (resolve, reject) {
+			AJAX.call('./messages?page=0&size=10&roomId=' + roomId, 'GET', resolve, reject);
+		});
+
+		promiseMember.then(
+			function(response) {
+				let result = JSON.parse(response);
+				me.setState({
+					members : result
+				});
+				return promiseMessage;
+			}, function(error) {
+				console.log(error);
+			}
+		).then(
+			function(response) {
+				me.bindData(response);
+			}, function(error) {
+				console.log(error);
+			}
+		);
 	}
 
 
@@ -115,6 +145,8 @@ export default class Chat extends React.Component {
 		this.setState({
 			data : result.content
 		});
+
+		this.focusToNewMessage();
 	}
 
 	sendProxyRequest(url, method, success, error, requestParam) {
@@ -141,7 +173,7 @@ export default class Chat extends React.Component {
 				<div container={this}>
 					<ChatHeader state={this.state.readyState} handleClose={this.closeChat} />
 				</div>
-				<div style={{height:"90%", overflow:"auto"}}>
+				<div id="messages" style={{height:"90%", overflow:"auto"}}>
 					{this.state.data.map((obj, i) => {
 						let myMessage = obj.sendedBy == userId;
 						return (<Message isMine={myMessage} content={obj.content} key={i}

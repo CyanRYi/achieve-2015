@@ -77,6 +77,9 @@ export default class EditPassword extends React.Component {
   }
 
   handleSubmit() {
+
+		if (this.state.validationMessage.length > 1) return;
+
     const AJAX = new Ajax();
 
     let params = {
@@ -85,7 +88,7 @@ export default class EditPassword extends React.Component {
 				passwordRepeat : this.state.passwordRepeat
 		};
 
-		AJAX.call('/users/password', 'PUT', console.log, console.log, params);
+		AJAX.call('/users/password', 'PUT', this.closeModal, console.log, params);
   }
 
 	render() {
@@ -101,7 +104,9 @@ export default class EditPassword extends React.Component {
                 기존 비밀번호
               </Col>
               <Col sm={8}>
-                <FormControl id="oldPassword" type="password" placeholder="기존 비밀번호" onChange={(event) => this.setState({oldPassword:event.target.value})} />
+                <FormControl autoFocus
+									id="oldPassword" type="password" placeholder="기존 비밀번호" value={this.state.oldPassword}
+									onChange={(event) => this.setState({oldPassword:event.target.value})} />
               </Col>
             </FormGroup>
             <FormGroup validationState={this.state.validationState["newPassword"]}>
@@ -109,7 +114,8 @@ export default class EditPassword extends React.Component {
                 새 비밀번호
               </Col>
               <Col sm={8}>
-                <FormControl id="newPassword" type="password" placeholder="새 비밀번호" onChange={this.handleChange} />
+                <FormControl id="newPassword" type="password" placeholder="새 비밀번호"  value={this.state.newPassword}
+									onChange={this.handleChange} />
               </Col>
             </FormGroup>
             <FormGroup validationState={this.state.validationState["passwordRepeat"]}>
@@ -117,7 +123,8 @@ export default class EditPassword extends React.Component {
                 비밀번호 확인
               </Col>
               <Col sm={8}>
-                <FormControl id="passwordRepeat" type="password" placeholder="비밀번호 확인" onChange={this.handleChange} />
+                <FormControl id="passwordRepeat" type="password" placeholder="비밀번호 확인" value={this.state.passwordRepeat}
+									onChange={this.handleChange} />
               </Col>
             </FormGroup>
             <Col smOffset={2} sm={10}>

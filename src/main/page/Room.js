@@ -21,10 +21,7 @@ export default class Room extends React.Component {
 		this.bindData = this.bindData.bind(this);
 		this.retrieveData = this.retrieveData.bind(this);
 		this.openRoom = this.openRoom.bind(this);
-	}
-
-	navigate() {
-		this.props.history.replaceState(null, '/');
+		this.closeChat = this.closeChat.bind(this);
 	}
 
 	componentWillMount() {
@@ -76,6 +73,14 @@ export default class Room extends React.Component {
 		});
 	}
 
+	closeChat() {
+		this.setState({
+			roomId : null,
+			data : []
+		});
+		this.retrieveData();
+	}
+
 	sendProxyRequest(url, method, success, error, requestParam) {
 		const AJAX = new Ajax();
 
@@ -93,7 +98,7 @@ export default class Room extends React.Component {
 			return (
 				<Chat
 					roomId={this.state.roomId}
-					closeChat={() => this.setState({roomId : null})} />
+					closeChat={this.closeChat} />
 			);
 		}
 		else {

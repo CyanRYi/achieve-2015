@@ -14,6 +14,7 @@ import org.sollabs.messenger.entity.Message;
 import org.sollabs.messenger.entity.Room;
 import org.sollabs.messenger.repository.AccountRepository;
 import org.sollabs.messenger.repository.MessageRepository;
+import org.sollabs.messenger.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
@@ -31,6 +32,9 @@ public class WebSocketSessionManager {
 	
 	@Autowired
 	private MessageRepository messageRepo;
+	
+	@Autowired
+	private RoomRepository roomRepo;
 	
 	private Map<UUID, HashSet<WebSocketSession>> sessions = new HashMap<UUID, HashSet<WebSocketSession>>();
 	
@@ -72,14 +76,18 @@ public class WebSocketSessionManager {
 	public void sendMessage(WebSocketSession session, TextMessage message) throws JsonParseException, JsonMappingException, IOException {
 		long userId = ((SystemAuthentication)session.getPrincipal()).getUserId();
 		
-		Message msg = new Message();
-		
 		ObjectMapper mapper = new ObjectMapper();
+		
+		// WebSocket Message Parsing
+		Message msg = new Message();
 		msg = mapper.readValue(message.getPayload(), Message.class);
 		msg.setSendedBy(userId);
 		
 		
-		System.out.println(msg);
+		// Set Room.LastMessage
+		Room room = roomRepo.findOne(msg.getRoomId());
+		room.setLastMessage(msg.getContent());		
+		roomRepo.save(room);
 		
 		try {
 			msg = messageRepo.save(msg);

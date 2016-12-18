@@ -10,12 +10,15 @@ export default class MyInfo extends React.Component {
 
 		this.state = {
 			editPassword : false,
-			mask : false
+			mask : false,
+			name : '',
+			comment : ''
 		};
 
 		this.retrieveData = this.retrieveData.bind(this);
 		this.bindData = this.bindData.bind(this);
 		this.handleChange = this.handleChange.bind(this);
+		this.handleSubmit = this.handleSubmit.bind(this);
 	}
 
 	componentWillMount() {
@@ -52,15 +55,29 @@ export default class MyInfo extends React.Component {
 
 	handleChange(event) {
 		if (event.target.id === 'name') {
-			if (event.target.value <= 20) {
-				this.setState({name : event.target.value});
+			if (event.target.value.length > 20) {
+				return;
 			}
 		}
 		else if (event.target.id === 'comment') {
-			if (event.target.value <= 50) {
-				this.setState({comment : event.target.value});
+			if (event.target.value.length > 50) {
+				return;
 			}
+			this.setState({
+				[event.target.id] : event.target.value
+			});
 		}
+
+	}
+
+	handleSubmit() {
+		let params = {
+			id : userId,
+			name : this.state.name,
+			comment : this.state.comment
+		}
+
+		this.sendProxyRequest('/users', 'PUT', console.log, console.log, params);
 	}
 
 	render() {
@@ -90,7 +107,8 @@ export default class MyInfo extends React.Component {
 			        이름
 			      </Col>
 			      <Col sm={10}>
-			        <FormControl id="name" type="text" placeholder="이름" onChange={this.handleChange} value={this.state.name} />
+			        <FormControl autoFocus id="name" type="text" placeholder="이름"
+								onChange={this.handleChange} value={this.state.name} />
 			      </Col>
 			    </FormGroup>
 					<FormGroup>
@@ -98,21 +116,20 @@ export default class MyInfo extends React.Component {
 			        코멘트
 			      </Col>
 			      <Col sm={10}>
-			        <FormControl id="comment" type="text" placeholder="코멘트" onChange={this.handleChange} value={this.state.comment} />
+			        <FormControl id="comment" type="text" placeholder="코멘트"
+								onChange={this.handleChange} value={this.state.comment || ''} />
 			      </Col>
 			    </FormGroup>
-					<FormGroup>
 			      <Col smOffset={2} sm={5}>
 							<Button bsStyle="warning" onClick={() => this.setState({editPassword : true})}>
 								비밀번호 변경
 							</Button>
 						</Col>
 						<Col sm={5}>
-							<Button>
+							<Button onClick={this.handleSubmit}>
 								저장
 							</Button>
 			      </Col>
-			    </FormGroup>
 				</Form>
 			</div>
 		);

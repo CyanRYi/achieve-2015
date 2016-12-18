@@ -29,15 +29,14 @@ export default class Header extends React.Component {
 				</Navbar.Header>
 				<Navbar.Collapse>
 					<Nav>
-						<NavItem eventKey={1} href="#/users">친구</NavItem>
-				    <NavItem eventKey={2} href="#/rooms">
-							대화
-							{this.props.new === true ? <Badge style={{color : 'red'}}>!</Badge> : null}
-						</NavItem>
+						<LinkContainer to="/users"><NavItem>친구</NavItem></LinkContainer>
+						<LinkContainer to="/rooms">
+							<NavItem>대화</NavItem>
+						</LinkContainer>
 					</Nav>
 					<Nav pullRight>
 						<NavDropdown title={username} id="personal-nav-menu-dropdown">
-							<LinkContainer to="/myInfo"><MenuItem>개인정보수정</MenuItem></LinkContainer>
+						<LinkContainer to="/myInfo"><MenuItem>개인정보수정</MenuItem></LinkContainer>
 				      <MenuItem href="/signout">로그아웃</MenuItem>
 						</NavDropdown>
 					</Nav>

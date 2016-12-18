@@ -2,7 +2,6 @@ package org.sollabs.messenger.service;
 
 import javax.transaction.Transactional;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.sollabs.messenger.dto.AccountDTO;
 import org.sollabs.messenger.entity.Account;
 import org.sollabs.messenger.repository.AccountRepository;
@@ -23,7 +22,6 @@ public class AccountServiceImpl implements AccountService {
 		return accountRepo.findOne(userId);
 	}
 
-	@Transactional
 	public void createUser(AccountDTO dto) throws Exception {
 		if (!dto.isPasswordRepeatedCorrectly()) {
 			throw new Exception("비밀번호 확인 불일치");
@@ -37,13 +35,9 @@ public class AccountServiceImpl implements AccountService {
 		Account account = new Account(dto);
 		
 		accountRepo.save(account);
-		
-		System.out.println(ToStringBuilder.reflectionToString(account));
 	}
 
 	public void changePassword(long myId, AccountDTO account) throws Exception {
-		System.out.println(ToStringBuilder.reflectionToString(account));
-		
 		if (!account.isPasswordRepeatedCorrectly()) {
 			throw new Exception("비밀번호 불일치");
 		}
@@ -57,5 +51,14 @@ public class AccountServiceImpl implements AccountService {
 		
 		accountRepo.save(me);
 	}
-	
+
+	@Transactional
+	public void changeUser(Account account) throws Exception {
+		
+		Account me = accountRepo.findOne(account.getId());
+		me.setName(account.getName());
+		me.setComment(account.getComment());
+		
+		accountRepo.save(me);
+	}
 }

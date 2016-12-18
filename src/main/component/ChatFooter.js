@@ -35,7 +35,7 @@ export default class ChatFooter extends React.Component {
     return (
       <FormGroup>
         <InputGroup style={{width:"100%"}}>
-          <FormControl value={this.state.value} onChange={this.handleChange}/>
+          <FormControl autoFocus value={this.state.value} onChange={this.handleChange}/>
           <InputGroup.Button>
             <Button onClick={this.handleSubmit}>전송</Button>
           </InputGroup.Button>

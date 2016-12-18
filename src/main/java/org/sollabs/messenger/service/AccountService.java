@@ -10,4 +10,6 @@ public interface AccountService {
 	public void createUser(AccountDTO account) throws Exception;
 	
 	public void changePassword(long myId, AccountDTO account) throws Exception;
+	
+	public void changeUser(Account account) throws Exception;
 }

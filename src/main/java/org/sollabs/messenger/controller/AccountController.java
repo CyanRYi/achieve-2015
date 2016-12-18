@@ -53,5 +53,15 @@ public class AccountController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
+	@PutMapping
+	public ResponseEntity<Object> changeUser(@RequestBody Account account, SystemAuthentication auth) throws Exception {
+		if (auth.getUserId() != account.getId()) {
+			return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+		}
+		accountService.changeUser(account);
+		
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
 	
 }

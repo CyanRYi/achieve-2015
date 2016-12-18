@@ -50,11 +50,27 @@ public class Friend {
 	}
 	
 	@Override
-	public boolean equals(Object o) {
-		if (!(o instanceof Friend)) {
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (friendId ^ (friendId >>> 32));
+		result = prime * result + (int) (userId ^ (userId >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
 			return false;
-		}
-		return (this.userId == ((Friend)o).getUserId() 
-				&& this.friendId == ((Friend)o).getFriendId());
+		if (getClass() != obj.getClass())
+			return false;
+		Friend other = (Friend) obj;
+		if (friendId != other.friendId)
+			return false;
+		if (userId != other.userId)
+			return false;
+		return true;
 	}
 }
