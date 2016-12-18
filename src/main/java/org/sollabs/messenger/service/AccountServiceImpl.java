@@ -8,10 +8,12 @@ import org.sollabs.messenger.exception.DuplicatedAccountException;
 import org.sollabs.messenger.exception.InvalidPasswordException;
 import org.sollabs.messenger.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@DependsOn("passwordEncoder")
 public class AccountServiceImpl implements AccountService {
 
 	@Autowired
@@ -35,6 +37,9 @@ public class AccountServiceImpl implements AccountService {
 		
 		dto.setPassword(passwordEncoder.encode(dto.getPassword()));
 		Account account = new Account(dto);
+		
+		//테스트용 더미
+		account.addFriend(1);
 		
 		accountRepo.save(account);
 	}
