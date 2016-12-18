@@ -2,7 +2,7 @@ import React from 'react';
 import Ajax from '../component/Ajax.js';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import { Panel, Form, ButtonGroup, FormControl, Button, Col } from 'react-bootstrap';
+import { Panel, Form, ButtonGroup, FormControl, Button, Col, HelpBlock } from 'react-bootstrap';
 
 export default class Join extends React.Component {
 
@@ -13,11 +13,13 @@ export default class Join extends React.Component {
 			email : '',
 			name : '',
 			password : '',
-			passwordRepeat : ''
+			passwordRepeat : '',
+      validationMessage : ''
 		};
 
 		this.handleChange = this.handleChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
+		this.handleError = this.handleError.bind(this);
 	}
 
 	componentWillUnmount() {
@@ -33,16 +35,40 @@ export default class Join extends React.Component {
 		else if (event.target.id === 'name') {
 			if (event.target.value.length > 20) return;
 		}
-		else if (event.target.id === 'comment') {
-			if (event.target.value.length > 50) return;
-		}
-
 		this.setState({
 			[event.target.id] : event.target.value
 		});
 	}
 
+	validate() {
+		if (!this.state.email) {
+			this.setState({validationMessage : '이메일은 필수 항목입니다.'});
+			return false;
+		}
+		else if (!this.state.name) {
+			this.setState({validationMessage : '이름은 필수 항목입니다.'});
+			return false;
+		}
+		else {
+			if (this.state.password.length < 8 || this.state.passwordRepeat.length < 8) {
+				this.setState({validationMessage : '비밀번호는 8자 이상이어야 합니다.'});
+				return false;
+			}
+			else {
+				if (this.state.passwordRepeat !== this.state.password) {
+					this.setState({validationMessage : '비밀번호가 일치하지 않습니다.'});
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	handleSubmit() {
+		if (!this.validate()) {
+			return;
+		}
+
 		let params = {
 			email : this.state.email,
 			name : this.state.name,
@@ -50,13 +76,18 @@ export default class Join extends React.Component {
 			passwordRepeat : this.state.passwordRepeat
 		}
 
-		this.sendProxyRequest('/users', 'POST', function() {location.href='/';}, console.log, params);
+		new Ajax().call('/users', 'POST', function() {location.href='/';}, this.handleError, params);
 	}
 
-	sendProxyRequest(url, method, success, error, requestParam) {
-		const AJAX = new Ajax();
+	handleError(response) {
+		var result = JSON.parse(response);
 
-		AJAX.call(url, method, success, error, requestParam);
+		switch(result.message) {
+			case 'Already Joined' : this.setState({validationMessage : '이미 가입된 이메일입니다.'});break;
+			case 'Invalid Password' : this.setState({validationMessage : '비밀번호가 잘못되었습니다.'});break;
+			case 'Email Not Valid' : this.setState({validationMessage : '잘못된 이메일 양식입니다.'});break;
+			default : this.setState({validationMessage : '알수 없는 에러가 발생하였습니다.'});
+		}
 	}
 
 	render() {
@@ -77,6 +108,7 @@ export default class Join extends React.Component {
 								id="passwordRepeat" type="password" placeholder="Password Repeat"
 								value={this.state.passwordRepeat} onChange={this.handleChange} />
 					</Form>
+					<HelpBlock>{this.state.validationMessage}</HelpBlock>
 					<Button bsStyle="primary" bsSize="large" block onClick={this.handleSubmit}>Sign On</Button>
 					<ButtonGroup justified>
 				    <LinkContainer to="/signin"><Button bsSize="small">Sign In</Button></LinkContainer>

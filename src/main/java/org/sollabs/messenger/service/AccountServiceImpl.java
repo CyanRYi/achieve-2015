@@ -4,6 +4,8 @@ import javax.transaction.Transactional;
 
 import org.sollabs.messenger.dto.AccountDTO;
 import org.sollabs.messenger.entity.Account;
+import org.sollabs.messenger.exception.DuplicatedAccountException;
+import org.sollabs.messenger.exception.InvalidPasswordException;
 import org.sollabs.messenger.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,11 +26,11 @@ public class AccountServiceImpl implements AccountService {
 
 	public void createUser(AccountDTO dto) throws Exception {
 		if (!dto.isPasswordRepeatedCorrectly()) {
-			throw new Exception("비밀번호 확인 불일치");
+			throw new InvalidPasswordException("비밀번호 확인 불일치");
 		}
 		
 		if (accountRepo.findByEmail(dto.getEmail()) != null) {
-			throw new Exception("이미 가입된 회원");
+			throw new DuplicatedAccountException("이미 가입된 회원");
 		}
 		
 		dto.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -39,12 +41,12 @@ public class AccountServiceImpl implements AccountService {
 
 	public void changePassword(long myId, AccountDTO account) throws Exception {
 		if (!account.isPasswordRepeatedCorrectly()) {
-			throw new Exception("비밀번호 불일치");
+			throw new InvalidPasswordException("비밀번호 불일치");
 		}
 		
 		Account me = accountRepo.findOne(myId);
 		if (!passwordEncoder.matches(account.getOldPassword(), me.getPassword())) {
-			throw new Exception("잘못된 비밀번호");
+			throw new InvalidPasswordException("잘못된 비밀번호");
 		}
 		
 		me.setPassword(passwordEncoder.encode(account.getPassword()));

@@ -30,8 +30,9 @@ class CommonAjaxHandler {
             	}
 							else return true;
             } else {
-								console.log(JSON.parse(xhr));
-                error(xhr);
+							if (error) {
+								error(xhr.responseText);
+							}
             }
         }
     };

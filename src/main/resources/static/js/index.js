@@ -47597,7 +47597,7 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -47605,56 +47605,57 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var CommonAjaxHandler = function () {
-	    function CommonAjaxHandler() {
-	        _classCallCheck(this, CommonAjaxHandler);
-	    }
+	  function CommonAjaxHandler() {
+	    _classCallCheck(this, CommonAjaxHandler);
+	  }
 
-	    _createClass(CommonAjaxHandler, [{
-	        key: 'call',
-	        value: function call(url, method, success, error, param) {
+	  _createClass(CommonAjaxHandler, [{
+	    key: 'call',
+	    value: function call(url, method, success, error, param) {
 
-	            // csrf Token Setter
-	            var metaTags = document.getElementsByTagName("meta");
+	      // csrf Token Setter
+	      var metaTags = document.getElementsByTagName("meta");
 
-	            var csrfToken;
-	            var csrfHeader;
+	      var csrfToken;
+	      var csrfHeader;
 
-	            for (var counter = 0; counter < metaTags.length; counter++) {
-	                if (metaTags[counter].getAttribute('name') == '_csrf') {
-	                    csrfToken = metaTags[counter].content;
-	                }
-
-	                if (metaTags[counter].getAttribute('name') == '_csrf_header') {
-	                    csrfHeader = metaTags[counter].content;
-	                }
-	            }
-
-	            var xhr = new XMLHttpRequest();
-
-	            xhr.open(method, url);
-	            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-	            xhr.setRequestHeader(csrfHeader, csrfToken);
-	            xhr.onreadystatechange = function () {
-	                if (xhr.readyState == 4) {
-	                    if (xhr.status == 200) {
-	                        if (success) {
-	                            success(xhr.responseText);
-	                        } else return true;
-	                    } else {
-	                        console.log(JSON.parse(xhr));
-	                        error(xhr);
-	                    }
-	                }
-	            };
-	            if (method === 'GET' || method === 'get') {
-	                xhr.send();
-	            } else {
-	                xhr.send(JSON.stringify(param));
-	            }
+	      for (var counter = 0; counter < metaTags.length; counter++) {
+	        if (metaTags[counter].getAttribute('name') == '_csrf') {
+	          csrfToken = metaTags[counter].content;
 	        }
-	    }]);
 
-	    return CommonAjaxHandler;
+	        if (metaTags[counter].getAttribute('name') == '_csrf_header') {
+	          csrfHeader = metaTags[counter].content;
+	        }
+	      }
+
+	      var xhr = new XMLHttpRequest();
+
+	      xhr.open(method, url);
+	      xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	      xhr.setRequestHeader(csrfHeader, csrfToken);
+	      xhr.onreadystatechange = function () {
+	        if (xhr.readyState == 4) {
+	          if (xhr.status == 200) {
+	            if (success) {
+	              success(xhr.responseText);
+	            } else return true;
+	          } else {
+	            if (error) {
+	              error(xhr.responseText);
+	            }
+	          }
+	        }
+	      };
+	      if (method === 'GET' || method === 'get') {
+	        xhr.send();
+	      } else {
+	        xhr.send(JSON.stringify(param));
+	      }
+	    }
+	  }]);
+
+	  return CommonAjaxHandler;
 	}();
 
 	;
@@ -49244,11 +49245,13 @@
 				email: '',
 				name: '',
 				password: '',
-				passwordRepeat: ''
+				passwordRepeat: '',
+				validationMessage: ''
 			};
 
 			_this.handleChange = _this.handleChange.bind(_this);
 			_this.handleSubmit = _this.handleSubmit.bind(_this);
+			_this.handleError = _this.handleError.bind(_this);
 			return _this;
 		}
 
@@ -49266,15 +49269,38 @@
 					if (event.target.value.length > 50) return;
 				} else if (event.target.id === 'name') {
 					if (event.target.value.length > 20) return;
-				} else if (event.target.id === 'comment') {
-					if (event.target.value.length > 50) return;
 				}
-
 				this.setState(_defineProperty({}, event.target.id, event.target.value));
+			}
+		}, {
+			key: 'validate',
+			value: function validate() {
+				if (!this.state.email) {
+					this.setState({ validationMessage: '이메일은 필수 항목입니다.' });
+					return false;
+				} else if (!this.state.name) {
+					this.setState({ validationMessage: '이름은 필수 항목입니다.' });
+					return false;
+				} else {
+					if (this.state.password.length < 8 || this.state.passwordRepeat.length < 8) {
+						this.setState({ validationMessage: '비밀번호는 8자 이상이어야 합니다.' });
+						return false;
+					} else {
+						if (this.state.passwordRepeat !== this.state.password) {
+							this.setState({ validationMessage: '비밀번호가 일치하지 않습니다.' });
+							return false;
+						}
+					}
+				}
+				return true;
 			}
 		}, {
 			key: 'handleSubmit',
 			value: function handleSubmit() {
+				if (!this.validate()) {
+					return;
+				}
+
 				var params = {
 					email: this.state.email,
 					name: this.state.name,
@@ -49282,16 +49308,25 @@
 					passwordRepeat: this.state.passwordRepeat
 				};
 
-				this.sendProxyRequest('/users', 'POST', function () {
+				new _Ajax2.default().call('/users', 'POST', function () {
 					location.href = '/';
-				}, console.log, params);
+				}, this.handleError, params);
 			}
 		}, {
-			key: 'sendProxyRequest',
-			value: function sendProxyRequest(url, method, success, error, requestParam) {
-				var AJAX = new _Ajax2.default();
+			key: 'handleError',
+			value: function handleError(response) {
+				var result = JSON.parse(response);
 
-				AJAX.call(url, method, success, error, requestParam);
+				switch (result.message) {
+					case 'Already Joined':
+						this.setState({ validationMessage: '이미 가입된 이메일입니다.' });break;
+					case 'Invalid Password':
+						this.setState({ validationMessage: '비밀번호가 잘못되었습니다.' });break;
+					case 'Email Not Valid':
+						this.setState({ validationMessage: '잘못된 이메일 양식입니다.' });break;
+					default:
+						this.setState({ validationMessage: '알수 없는 에러가 발생하였습니다.' });
+				}
 			}
 		}, {
 			key: 'render',
@@ -49317,6 +49352,11 @@
 							_react2.default.createElement(_reactBootstrap.FormControl, {
 								id: 'passwordRepeat', type: 'password', placeholder: 'Password Repeat',
 								value: this.state.passwordRepeat, onChange: this.handleChange })
+						),
+						_react2.default.createElement(
+							_reactBootstrap.HelpBlock,
+							null,
+							this.state.validationMessage
 						),
 						_react2.default.createElement(
 							_reactBootstrap.Button,
