@@ -29,7 +29,7 @@ public class UserTest {
 		friendService.addFriend(1,  3);
 	}
 	
-	@Test
+	/*@Test
 	@Transactional
 	public void addFriend() {
 
@@ -57,5 +57,5 @@ public class UserTest {
 		
 		System.out.println("Friends Size After Remove : " + me.getMyFriends().size());
 		assertEquals(friendsSize-1, me.getMyFriends().size());
-	}
+	}*/
 }

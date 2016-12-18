@@ -27,7 +27,7 @@ export default class Header extends React.Component {
 	}
 
 	componentDidMount() {
-		var ws = new WebSocketClient("ws://localhost:9000/connect");
+		var ws = new WebSocketClient("ws://127.0.0.1:9000/connect");
 
 		let me = this;
 
