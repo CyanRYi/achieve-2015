@@ -86,6 +86,10 @@
 
 	var _Join2 = _interopRequireDefault(_Join);
 
+	var _FindPassword = __webpack_require__(516);
+
+	var _FindPassword2 = _interopRequireDefault(_FindPassword);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -115,6 +119,8 @@
 		_createClass(App, [{
 			key: 'componentWillUnmount',
 			value: function componentWillUnmount() {
+				ws.removeMessageCallback(0);
+
 				if (this.serverRequest) {
 					this.serverRequest.abort();
 				}
@@ -125,7 +131,7 @@
 		}, {
 			key: 'onWebSocketClientOpen',
 			value: function onWebSocketClientOpen(ws) {
-				ws.onMessage = this.onReceiveMessage;
+				ws.addMessageCallback(0, this.onReceiveMessage);
 
 				this.setState({
 					ws: ws
@@ -142,6 +148,8 @@
 				if (auth.principal === 'anonymousUser') {
 					if (this.props.location.pathname === '/join') {
 						return _react2.default.createElement(_Join2.default, null);
+					} else if (this.props.location.pathname === '/findPassword') {
+						return _react2.default.createElement(_FindPassword2.default, null);
 					}
 					return _react2.default.createElement(_SignIn2.default, null);
 				}
@@ -172,7 +180,8 @@
 			_react2.default.createElement(_reactRouter.Route, { path: '/users', component: _Friend2.default }),
 			_react2.default.createElement(_reactRouter.Route, { path: '/rooms(/:childrenData)', component: _Room2.default }),
 			_react2.default.createElement(_reactRouter.Route, { path: '/join', component: _Join2.default }),
-			_react2.default.createElement(_reactRouter.Route, { path: '/signin', component: _SignIn2.default })
+			_react2.default.createElement(_reactRouter.Route, { path: '/signin', component: _SignIn2.default }),
+			_react2.default.createElement(_reactRouter.Route, { path: '/findPassword', component: _FindPassword2.default })
 		)
 	), document.getElementById('app'));
 
@@ -47238,7 +47247,7 @@
 /* 503 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -47253,43 +47262,82 @@
 	    _classCallCheck(this, WebSocketClient);
 
 	    this.ws = new WebSocket(url);
+	    this.messageCallback = [];
 	  }
 
 	  _createClass(WebSocketClient, [{
-	    key: "send",
+	    key: 'send',
 	    value: function send(message) {
 	      this.ws.send(message);
 	    }
 	  }, {
-	    key: "close",
+	    key: 'close',
 	    value: function close() {
 	      this.ws.close();
 	    }
 	  }, {
-	    key: "readyState",
+	    key: 'addMessageCallback',
+	    value: function addMessageCallback(order, callback) {
+	      if (this.messageCallback.includes(callback)) {
+	        return;
+	      }
+
+	      if (!Number.isInteger(order)) {
+	        this.messageCallback.push(callback);
+	      } else {
+	        this.messageCallback.splice(order, 0, callback);
+	      }
+
+	      var callbacks = this.messageCallback;
+
+	      this.ws.onmessage = function (message) {
+	        callbacks.map(function (callback) {
+	          return callback(message);
+	        });
+	      };
+	    }
+	  }, {
+	    key: 'removeMessageCallback',
+	    value: function removeMessageCallback(val) {
+	      var index = void 0;
+	      if (Number.isInteger(val)) {
+	        index = val;
+	      } else if (val && {}.toString.call(val) === '[object Function]') {
+	        index = this.messageCallback.indexOf(val);
+	      }
+
+	      this.messageCallback.splice(index, 1);
+
+	      var callbacks = this.messageCallback;
+
+	      this.ws.onmessage = function (message) {
+	        callbacks.map(function (callback) {
+	          return callback(message);
+	        });
+	      };
+	    }
+	  }, {
+	    key: 'readyState',
 	    get: function get() {
 	      return this.ws.readyState;
 	    }
 	  }, {
-	    key: "onOpen",
+	    key: 'onOpen',
 	    set: function set(callback) {
 	      this.ws.onopen = callback;
 	    }
 	  }, {
-	    key: "onClose",
+	    key: 'onClose',
 	    set: function set(callback) {
 	      this.ws.onclose = callback;
 	    }
 	  }, {
-	    key: "onMessage",
+	    key: 'onMessage',
 	    get: function get() {
 	      return this.ws.onmessage;
-	    },
-	    set: function set(callback) {
-	      this.ws.onmessage = callback;
 	    }
 	  }, {
-	    key: "onError",
+	    key: 'onError',
 	    set: function set(callback) {
 	      this.ws.onerror = callback;
 	    }
@@ -47906,8 +47954,7 @@
 				activePage: 1,
 				mask: false,
 				editMode: false,
-				roomId: _this.props.params.childrenData,
-				legacyOnMessage: _this.props.ws.onMessage
+				roomId: _this.props.params.childrenData
 			};
 
 			_this.bindData = _this.bindData.bind(_this);
@@ -47926,7 +47973,7 @@
 		}, {
 			key: 'componentWillUnmount',
 			value: function componentWillUnmount() {
-				this.props.ws.onMessage = this.state.legacyOnMessage;
+				this.props.ws.removeMessageCallback(this.onReceiveMessage);
 
 				if (this.serverRequest) {
 					this.serverRequest.abort();
@@ -47935,12 +47982,7 @@
 		}, {
 			key: 'componentDidMount',
 			value: function componentDidMount() {
-				var me = this;
-
-				this.props.ws.onMessage = function (message) {
-					me.state.legacyOnMessage(message);
-					me.onReceiveMessage(message);
-				};
+				this.props.ws.addMessageCallback(null, this.onReceiveMessage);
 			}
 		}, {
 			key: 'onReceiveMessage',
@@ -48168,11 +48210,8 @@
 
 			_this.state = {
 				data: [],
-				members: [],
-				legacyOnMessage: _this.props.ws.onMessage
+				members: []
 			};
-
-			console.log(_this.props.ws.onMessage);
 
 			_this.bindData = _this.bindData.bind(_this);
 			_this.retrieveData = _this.retrieveData.bind(_this);
@@ -48193,7 +48232,7 @@
 				var me = this;
 
 				var _promiseRollbackOnMessage = new Promise(function (resolve, reject) {
-					me.props.ws.onMessage = me.state.legacyOnMessage;
+					me.props.ws.removeMessageCallback(me.onReceiveMessage);
 				});
 
 				var _promiseRequestAbort = new Promise(function (resolve, reject) {
@@ -48209,18 +48248,16 @@
 		}, {
 			key: 'componentDidMount',
 			value: function componentDidMount() {
-				var me = this;
-				this.props.ws.onMessage = function (message) {
-					me.state.legacyOnMessage(message);
-					me.onReceiveMessage(message);
-				};
+				this.props.ws.addMessageCallback(null, this.onReceiveMessage);
 			}
 		}, {
 			key: 'onReceiveMessage',
 			value: function onReceiveMessage(response) {
-				var message = JSON.parse(response.data);
+				var newMessage = JSON.parse(response.data);
+
+				var messages = this.state.data.slice(0).concat(newMessage);
 				this.setState({
-					data: this.state.data.slice(0).concat(message)
+					data: messages
 				});
 
 				this.focusToNewMessage();
@@ -49168,11 +49205,13 @@
 								)
 							),
 							_react2.default.createElement(
-								_reactBootstrap.Button,
-								{ href: '#', bsSize: 'small', onClick: function onClick() {
-										return console.log("join");
-									} },
-								'Forgot Password?'
+								_reactRouterBootstrap.LinkContainer,
+								{ to: '/findPassword' },
+								_react2.default.createElement(
+									_reactBootstrap.Button,
+									{ bsSize: 'small' },
+									'Forgot Password?'
+								)
 							)
 						)
 					)
@@ -49289,7 +49328,6 @@
 		}, {
 			key: 'handleSubmit',
 			value: function handleSubmit() {
-				console.log(this.state);
 				if (!this.validate()) {
 					return;
 				}
@@ -49369,11 +49407,13 @@
 								)
 							),
 							_react2.default.createElement(
-								_reactBootstrap.Button,
-								{ href: '#', bsSize: 'small', onClick: function onClick() {
-										return console.log("join");
-									} },
-								'Forgot Password?'
+								_reactRouterBootstrap.LinkContainer,
+								{ to: '/findPassword' },
+								_react2.default.createElement(
+									_reactBootstrap.Button,
+									{ bsSize: 'small' },
+									'Forgot Password?'
+								)
 							)
 						)
 					)
@@ -49385,6 +49425,96 @@
 	}(_react2.default.Component);
 
 	exports.default = Join;
+
+/***/ },
+/* 516 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _Ajax = __webpack_require__(505);
+
+	var _Ajax2 = _interopRequireDefault(_Ajax);
+
+	var _reactRouterBootstrap = __webpack_require__(500);
+
+	var _reactBootstrap = __webpack_require__(247);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var FindPassword = function (_React$Component) {
+		_inherits(FindPassword, _React$Component);
+
+		function FindPassword(props) {
+			_classCallCheck(this, FindPassword);
+
+			return _possibleConstructorReturn(this, (FindPassword.__proto__ || Object.getPrototypeOf(FindPassword)).call(this, props));
+		}
+
+		_createClass(FindPassword, [{
+			key: 'componentWillUnmount',
+			value: function componentWillUnmount() {
+				if (this.serverRequest) {
+					this.serverRequest.abort();
+				}
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				return _react2.default.createElement(
+					_reactBootstrap.Col,
+					{ smOffset: 3, sm: 6 },
+					_react2.default.createElement(
+						_reactBootstrap.Panel,
+						{ header: 'Find Password', style: { marginTop: '50px' } },
+						'Sorry, Not Supported Yet.',
+						_react2.default.createElement(
+							_reactBootstrap.ButtonGroup,
+							{ justified: true },
+							_react2.default.createElement(
+								_reactRouterBootstrap.LinkContainer,
+								{ to: '/signin' },
+								_react2.default.createElement(
+									_reactBootstrap.Button,
+									{ bsSize: 'small' },
+									'Sign In'
+								)
+							),
+							_react2.default.createElement(
+								_reactRouterBootstrap.LinkContainer,
+								{ to: '/join' },
+								_react2.default.createElement(
+									_reactBootstrap.Button,
+									{ bsSize: 'small' },
+									'Sign up'
+								)
+							)
+						)
+					)
+				);
+			}
+		}]);
+
+		return FindPassword;
+	}(_react2.default.Component);
+
+	exports.default = FindPassword;
 
 /***/ }
 /******/ ]);

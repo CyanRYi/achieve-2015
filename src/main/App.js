@@ -9,6 +9,7 @@ import Room from './page/Room.js';
 import MyInfo from './page/MyInfo.js';
 import SignIn from './page/SignIn.js';
 import Join from './page/Join.js';
+import FindPassword from './page/FindPassword.js';
 
 export default class App extends React.Component {
 	constructor(props) {
@@ -24,6 +25,8 @@ export default class App extends React.Component {
 	}
 
 	componentWillUnmount() {
+		ws.removeMessageCallback(0);
+
 		if (this.serverRequest) {
 			this.serverRequest.abort();
 		}
@@ -33,7 +36,7 @@ export default class App extends React.Component {
 	}
 
 	onWebSocketClientOpen(ws) {
-		ws.onMessage = this.onReceiveMessage;
+		ws.addMessageCallback(0, this.onReceiveMessage);
 
 		this.setState({
 			ws : ws
@@ -48,6 +51,9 @@ export default class App extends React.Component {
 		if (auth.principal === 'anonymousUser') {
 			if (this.props.location.pathname === '/join') {
 				return (<Join />);
+			}
+			else if (this.props.location.pathname === '/findPassword') {
+				return (<FindPassword />);
 			}
 			return(<SignIn />);
 		}
@@ -70,6 +76,7 @@ ReactDOM.render((
 				<Route path="/rooms(/:childrenData)" component={Room}></Route>
 				<Route path="/join" component={Join}></Route>
 				<Route path="/signin" component={SignIn}></Route>
+				<Route path="/findPassword" component={FindPassword}></Route>
 			</Route>
 		</Router>
 ), document.getElementById('app'));

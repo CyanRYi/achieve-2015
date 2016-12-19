@@ -15,14 +15,11 @@ export default class Chat extends React.Component {
 		if (!this.props.ws) {
 			location.href='/';
 		}
-		
+
 		this.state = {
 			data : [],
-			members : [],
-			legacyOnMessage : this.props.ws.onMessage
+			members : []
 		};
-
-		console.log(this.props.ws.onMessage);
 
 		this.bindData = this.bindData.bind(this);
 		this.retrieveData = this.retrieveData.bind(this);
@@ -39,7 +36,7 @@ export default class Chat extends React.Component {
 		let me = this;
 
 		var _promiseRollbackOnMessage = new Promise(function(resolve, reject) {
-			me.props.ws.onMessage = me.state.legacyOnMessage;
+			me.props.ws.removeMessageCallback(me.onReceiveMessage);
 		});
 
 		var _promiseRequestAbort = new Promise(function(resolve, reject) {
@@ -55,17 +52,15 @@ export default class Chat extends React.Component {
 	}
 
 	componentDidMount() {
-		let me = this;
-		this.props.ws.onMessage = function(message) {
-			me.state.legacyOnMessage(message);
-			me.onReceiveMessage(message);
-		};
+		this.props.ws.addMessageCallback(null, this.onReceiveMessage);
 	}
 
 	onReceiveMessage(response) {
-		let message = JSON.parse(response.data);
+		let newMessage = JSON.parse(response.data);
+
+		let messages = this.state.data.slice(0).concat(newMessage);
 		this.setState({
-			data : this.state.data.slice(0).concat(message)
+			data : messages
 		});
 
 		this.focusToNewMessage();

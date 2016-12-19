@@ -19,8 +19,7 @@ export default class Room extends React.Component {
 			activePage : 1,
 			mask : false,
 			editMode : false,
-			roomId : this.props.params.childrenData,
-			legacyOnMessage : this.props.ws.onMessage
+			roomId : this.props.params.childrenData
 		};
 
 		this.bindData = this.bindData.bind(this);
@@ -35,7 +34,7 @@ export default class Room extends React.Component {
 	}
 
 	componentWillUnmount() {
-		this.props.ws.onMessage = this.state.legacyOnMessage;
+		this.props.ws.removeMessageCallback(this.onReceiveMessage);
 
 		if (this.serverRequest) {
 			this.serverRequest.abort();
@@ -43,12 +42,7 @@ export default class Room extends React.Component {
 	}
 
 	componentDidMount() {
-		let me = this;
-
-		this.props.ws.onMessage = function(message) {
-			me.state.legacyOnMessage(message);
-			me.onReceiveMessage(message);
-		};
+		this.props.ws.addMessageCallback(null, this.onReceiveMessage);
 	}
 
 	onReceiveMessage(response) {
