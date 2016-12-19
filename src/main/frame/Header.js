@@ -27,7 +27,7 @@ export default class Header extends React.Component {
 	}
 
 	componentDidMount() {
-		var ws = new WebSocketClient("ws://52.78.6.211:9000/connect");
+		var ws = new WebSocketClient('ws://' + window.location.host + '/connect');
 
 		let me = this;
 
@@ -63,8 +63,10 @@ export default class Header extends React.Component {
 				<Navbar.Header>
 					<LinkContainer to="/">
 						<Navbar.Brand>
-							<span style={{color : this.getConnectState()}}>●</span>
-							<span>Logo</span>
+							<div>
+								<span style={{color : this.getConnectState()}}>●</span>
+								<span>Logo</span>
+							</div>
 						</Navbar.Brand>
 					</LinkContainer>
 					<Navbar.Toggle />

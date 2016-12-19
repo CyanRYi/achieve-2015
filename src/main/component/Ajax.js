@@ -4,18 +4,8 @@ class CommonAjaxHandler {
 		// csrf Token Setter
 		var metaTags = document.getElementsByTagName("meta");
 
-		var csrfToken;
-		var csrfHeader;
-
-		for (var counter = 0; counter < metaTags.length; counter++) {
-	        if (metaTags[counter].getAttribute('name') == '_csrf') {
-	        	csrfToken = metaTags[counter].content;
-	        }
-
-	        if (metaTags[counter].getAttribute('name') == '_csrf_header') {
-	        	csrfHeader = metaTags[counter].content;
-	        }
-	    }
+		var csrfToken = metaTags._csrf.content;
+		var csrfHeader = metaTags._csrf_header.content;
 
 		var xhr = new XMLHttpRequest();
 

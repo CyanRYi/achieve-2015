@@ -27893,7 +27893,7 @@
 		}, {
 			key: 'componentDidMount',
 			value: function componentDidMount() {
-				var ws = new _WebSocketClient2.default("ws://52.78.6.211:9000/connect");
+				var ws = new _WebSocketClient2.default('ws://' + window.location.host + '/connect');
 
 				var me = this;
 
@@ -27942,14 +27942,18 @@
 								_reactBootstrap.Navbar.Brand,
 								null,
 								_react2.default.createElement(
-									'span',
-									{ style: { color: this.getConnectState() } },
-									'\u25CF'
-								),
-								_react2.default.createElement(
-									'span',
+									'div',
 									null,
-									'Logo'
+									_react2.default.createElement(
+										'span',
+										{ style: { color: this.getConnectState() } },
+										'\u25CF'
+									),
+									_react2.default.createElement(
+										'span',
+										null,
+										'Logo'
+									)
 								)
 							)
 						),
@@ -47595,7 +47599,7 @@
 /* 505 */
 /***/ function(module, exports) {
 
-	'use strict';
+	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -47611,24 +47615,14 @@
 	  }
 
 	  _createClass(CommonAjaxHandler, [{
-	    key: 'call',
+	    key: "call",
 	    value: function call(url, method, success, error, param) {
 
 	      // csrf Token Setter
 	      var metaTags = document.getElementsByTagName("meta");
 
-	      var csrfToken;
-	      var csrfHeader;
-
-	      for (var counter = 0; counter < metaTags.length; counter++) {
-	        if (metaTags[counter].getAttribute('name') == '_csrf') {
-	          csrfToken = metaTags[counter].content;
-	        }
-
-	        if (metaTags[counter].getAttribute('name') == '_csrf_header') {
-	          csrfHeader = metaTags[counter].content;
-	        }
-	      }
+	      var csrfToken = metaTags._csrf.content;
+	      var csrfHeader = metaTags._csrf_header.content;
 
 	      var xhr = new XMLHttpRequest();
 
@@ -49119,17 +49113,8 @@
 			value: function handleSubmit() {
 				var metaTags = document.getElementsByTagName("meta");
 
-				var csrfToken;
-				var csrfHeader;
-
-				for (var counter = 0; counter < metaTags.length; counter++) {
-					if (metaTags[counter].getAttribute('name') == '_csrf') {
-						csrfToken = metaTags[counter].content;
-					}
-					if (metaTags[counter].getAttribute('name') == '_csrf_header') {
-						csrfHeader = metaTags[counter].content;
-					}
-				}
+				var csrfToken = metaTags._csrf.content;
+				var csrfHeader = metaTags._csrf_header.content;
 
 				var xhr = new XMLHttpRequest();
 				xhr.open('POST', '/sign-in-process');
