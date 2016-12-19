@@ -17,12 +17,11 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		registry.addResourceHandler("/js/**").addResourceLocations("classpath:/static/js/");
 		registry.addResourceHandler("/fonts/**").addResourceLocations("classpath:/static/fonts/");
 		registry.addResourceHandler("/images/**").addResourceLocations("classpath:/static/images/");
+		
 	}
 
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
 		registry.addViewController("/").setViewName("index");
-		registry.addViewController("/signin").setViewName("signin");
-		registry.addViewController("/join").setViewName("join");
-	}
+	}	
 }

@@ -9,7 +9,7 @@ class CommonAjaxHandler {
 
 		var xhr = new XMLHttpRequest();
 
-    xhr.open(method, url);
+    xhr.open(method, '/api' + url);
     xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     xhr.setRequestHeader(csrfHeader, csrfToken);
     xhr.onreadystatechange = function() {

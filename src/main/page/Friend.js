@@ -40,7 +40,7 @@ class Friend extends React.Component {
 	retrieveData(page, params) {
 		let activePage = page ? page : 1;
 		let pageSize = 20;
-		let url = "./friends";
+		let url = "/friends";
 		let method = params ? 'POST' : 'GET';
 
 		let searchParams = {};
@@ -76,7 +76,7 @@ class Friend extends React.Component {
 	removeFriend(event) {
 		let me = this;
 
-		let url = "./friends";
+		let url = "/friends";
 		let method = 'DELETE';
 
 		var removeFriendCallback = function(response) {
@@ -96,7 +96,7 @@ class Friend extends React.Component {
 		let result = JSON.parse(response);
 
 		result.content.map((obj) => {
-				this.sendProxyRequest("./users/" + obj.friendId, "GET", this.getFriendInfoCallback);
+				this.sendProxyRequest("/users/" + obj.friendId, "GET", this.getFriendInfoCallback);
 		});
 
 		this.setState({
@@ -118,7 +118,7 @@ class Friend extends React.Component {
 	}
 
 	openRoom(event) {
-		let url = "./rooms/" + event._dispatchInstances._currentElement.key;
+		let url = "/rooms/" + event._dispatchInstances._currentElement.key;
 		let method = 'GET';
 
 		var _promise = new Promise(function (resolve, reject) {

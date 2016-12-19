@@ -64,7 +64,7 @@ export default class Room extends React.Component {
 	retrieveData(page, params) {
 		let activePage = page ? page : 1;
 		let pageSize = 20;
-		let url = "./rooms";
+		let url = "/rooms";
 		let method = params ? 'POST' : 'GET';
 
 		let searchParams = {};

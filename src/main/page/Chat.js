@@ -78,12 +78,12 @@ export default class Chat extends React.Component {
 
 		var promiseMember = new Promise(function (resolve, reject) {
 			if (roomId) {
-					AJAX.call('./rooms/members/' + roomId, 'GET', resolve, reject);
+					AJAX.call('/rooms/members/' + roomId, 'GET', resolve, reject);
 			}
 		});
 
 		var promiseMessage = new Promise(function (resolve, reject) {
-			AJAX.call('./messages/' + roomId + '?page=0&size=10&sort=sendedAt,desc', 'GET', resolve, reject);
+			AJAX.call('/messages/' + roomId + '?page=0&size=10&sort=sendedAt,desc', 'GET', resolve, reject);
 		});
 
 		promiseMember.then(

@@ -47429,7 +47429,7 @@
 			value: function retrieveData(page, params) {
 				var activePage = page ? page : 1;
 				var pageSize = 20;
-				var url = "./friends";
+				var url = "/friends";
 				var method = params ? 'POST' : 'GET';
 
 				var searchParams = {};
@@ -47465,7 +47465,7 @@
 			value: function removeFriend(event) {
 				var me = this;
 
-				var url = "./friends";
+				var url = "/friends";
 				var method = 'DELETE';
 
 				var removeFriendCallback = function removeFriendCallback(response) {
@@ -47490,7 +47490,7 @@
 				var result = JSON.parse(response);
 
 				result.content.map(function (obj) {
-					_this2.sendProxyRequest("./users/" + obj.friendId, "GET", _this2.getFriendInfoCallback);
+					_this2.sendProxyRequest("/users/" + obj.friendId, "GET", _this2.getFriendInfoCallback);
 				});
 
 				this.setState({
@@ -47514,7 +47514,7 @@
 		}, {
 			key: 'openRoom',
 			value: function openRoom(event) {
-				var url = "./rooms/" + event._dispatchInstances._currentElement.key;
+				var url = "/rooms/" + event._dispatchInstances._currentElement.key;
 				var method = 'GET';
 
 				var _promise = new Promise(function (resolve, reject) {
@@ -47674,7 +47674,7 @@
 
 	      var xhr = new XMLHttpRequest();
 
-	      xhr.open(method, url);
+	      xhr.open(method, '/api' + url);
 	      xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	      xhr.setRequestHeader(csrfHeader, csrfToken);
 	      xhr.onreadystatechange = function () {
@@ -48007,7 +48007,7 @@
 			value: function retrieveData(page, params) {
 				var activePage = page ? page : 1;
 				var pageSize = 20;
-				var url = "./rooms";
+				var url = "/rooms";
 				var method = params ? 'POST' : 'GET';
 
 				var searchParams = {};
@@ -48277,12 +48277,12 @@
 
 				var promiseMember = new Promise(function (resolve, reject) {
 					if (roomId) {
-						AJAX.call('./rooms/members/' + roomId, 'GET', resolve, reject);
+						AJAX.call('/rooms/members/' + roomId, 'GET', resolve, reject);
 					}
 				});
 
 				var promiseMessage = new Promise(function (resolve, reject) {
-					AJAX.call('./messages/' + roomId + '?page=0&size=10&sort=sendedAt,desc', 'GET', resolve, reject);
+					AJAX.call('/messages/' + roomId + '?page=0&size=10&sort=sendedAt,desc', 'GET', resolve, reject);
 				});
 
 				promiseMember.then(function (response) {
