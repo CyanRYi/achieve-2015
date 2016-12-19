@@ -27931,7 +27931,7 @@
 			value: function render() {
 				return _react2.default.createElement(
 					_reactBootstrap.Navbar,
-					{ inverse: true },
+					{ collapseOnSelect: true, fluid: true },
 					_react2.default.createElement(
 						_reactBootstrap.Navbar.Header,
 						null,
@@ -27943,11 +27943,17 @@
 								null,
 								_react2.default.createElement(
 									'span',
+									{ style: { color: this.getConnectState() } },
+									'\u25CF'
+								),
+								_react2.default.createElement(
+									'span',
 									null,
-									'Logo Here'
+									'Logo'
 								)
 							)
-						)
+						),
+						_react2.default.createElement(_reactBootstrap.Navbar.Toggle, null)
 					),
 					_react2.default.createElement(
 						_reactBootstrap.Navbar.Collapse,
@@ -27995,11 +28001,6 @@
 									'\uB85C\uADF8\uC544\uC6C3'
 								)
 							)
-						),
-						_react2.default.createElement(
-							_reactBootstrap.Navbar.Text,
-							{ pullRight: true, style: { color: this.getConnectState() } },
-							'\u25CF'
 						)
 					)
 				);
@@ -49178,7 +49179,7 @@
 								_react2.default.createElement(
 									_reactBootstrap.Button,
 									{ bsSize: 'small' },
-									'Join'
+									'Sign up'
 								)
 							),
 							_react2.default.createElement(
@@ -49343,7 +49344,7 @@
 					{ smOffset: 3, sm: 6 },
 					_react2.default.createElement(
 						_reactBootstrap.Panel,
-						{ header: 'Sign On', style: { marginTop: '50px' } },
+						{ header: 'Sign Up', style: { marginTop: '50px' } },
 						_react2.default.createElement(
 							_reactBootstrap.Form,
 							null,
@@ -49368,7 +49369,7 @@
 						_react2.default.createElement(
 							_reactBootstrap.Button,
 							{ bsStyle: 'primary', bsSize: 'large', block: true, onClick: this.handleSubmit },
-							'Sign On'
+							'Sign Up'
 						),
 						_react2.default.createElement(
 							_reactBootstrap.ButtonGroup,

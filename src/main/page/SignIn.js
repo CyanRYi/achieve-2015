@@ -81,7 +81,7 @@ export default class SignIn extends React.Component {
 					</Form>
 					<Button bsStyle="primary" bsSize="large" block onClick={this.handleSubmit}>Sign In</Button>
 					<ButtonGroup justified>
-				    <LinkContainer to="/join"><Button bsSize="small">Join</Button></LinkContainer>
+				    <LinkContainer to="/join"><Button bsSize="small">Sign up</Button></LinkContainer>
 				    <Button href="#" bsSize="small" onClick={() => console.log("join")}>Forgot Password?</Button>
 				  </ButtonGroup>
 				</Panel>

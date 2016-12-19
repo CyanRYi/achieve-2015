@@ -100,7 +100,7 @@ export default class Join extends React.Component {
 	render() {
 		return (
 			<Col smOffset={3} sm={6}>
-				<Panel header="Sign On" style={{marginTop: '50px'}}>
+				<Panel header="Sign Up" style={{marginTop: '50px'}}>
 					<Form>
 							<FormControl autoFocus
 								id="email" placeholder="E-mail" type="text"
@@ -116,7 +116,7 @@ export default class Join extends React.Component {
 								value={this.state.passwordRepeat} onChange={this.handleChange} />
 					</Form>
 					<HelpBlock>{this.state.validationMessage}</HelpBlock>
-					<Button bsStyle="primary" bsSize="large" block onClick={this.handleSubmit}>Sign On</Button>
+					<Button bsStyle="primary" bsSize="large" block onClick={this.handleSubmit}>Sign Up</Button>
 					<ButtonGroup justified>
 				    <LinkContainer to="/signin"><Button bsSize="small">Sign In</Button></LinkContainer>
 				    <Button href="#" bsSize="small" onClick={() => console.log("join")}>Forgot Password?</Button>

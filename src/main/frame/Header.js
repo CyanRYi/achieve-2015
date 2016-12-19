@@ -57,16 +57,17 @@ export default class Header extends React.Component {
 		}
 	}
 
-
 	render() {
 		return (
-			<Navbar inverse>
+			<Navbar collapseOnSelect fluid>
 				<Navbar.Header>
 					<LinkContainer to="/">
 						<Navbar.Brand>
-							<span>Logo Here</span>
+							<span style={{color : this.getConnectState()}}>●</span>
+							<span>Logo</span>
 						</Navbar.Brand>
 					</LinkContainer>
+					<Navbar.Toggle />
 				</Navbar.Header>
 				<Navbar.Collapse>
 					<Nav>
@@ -81,9 +82,6 @@ export default class Header extends React.Component {
 				      <MenuItem href="/signout">로그아웃</MenuItem>
 						</NavDropdown>
 					</Nav>
-					<Navbar.Text pullRight style={{color : this.getConnectState()}}>
-		        ●
-		      </Navbar.Text>
 				</Navbar.Collapse>
 			</Navbar>
 		);
