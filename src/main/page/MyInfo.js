@@ -120,12 +120,12 @@ export default class MyInfo extends React.Component {
 			      </Col>
 			    </FormGroup>
 			      <Col smOffset={2} sm={5}>
-							<Button bsStyle="warning" onClick={() => this.setState({editPassword : true})}>
+							<Button block bsStyle="warning" onClick={() => this.setState({editPassword : true})}>
 								비밀번호 변경
 							</Button>
 						</Col>
 						<Col sm={5}>
-							<Button onClick={this.handleSubmit}>
+							<Button block onClick={this.handleSubmit}>
 								저장
 							</Button>
 			      </Col>

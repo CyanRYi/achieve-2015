@@ -48791,7 +48791,7 @@
 							{ smOffset: 2, sm: 5 },
 							_react2.default.createElement(
 								_reactBootstrap.Button,
-								{ bsStyle: 'warning', onClick: function onClick() {
+								{ block: true, bsStyle: 'warning', onClick: function onClick() {
 										return _this2.setState({ editPassword: true });
 									} },
 								'\uBE44\uBC00\uBC88\uD638 \uBCC0\uACBD'
@@ -48802,7 +48802,7 @@
 							{ sm: 5 },
 							_react2.default.createElement(
 								_reactBootstrap.Button,
-								{ onClick: this.handleSubmit },
+								{ block: true, onClick: this.handleSubmit },
 								'\uC800\uC7A5'
 							)
 						)
