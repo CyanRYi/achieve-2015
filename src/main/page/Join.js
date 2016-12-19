@@ -71,7 +71,6 @@ export default class Join extends React.Component {
 	}
 
 	handleSubmit() {
-		console.log(this.state);
 		if (!this.validate()) {
 			return;
 		}
@@ -119,7 +118,7 @@ export default class Join extends React.Component {
 					<Button bsStyle="primary" bsSize="large" block onClick={this.handleSubmit}>Sign Up</Button>
 					<ButtonGroup justified>
 				    <LinkContainer to="/signin"><Button bsSize="small">Sign In</Button></LinkContainer>
-				    <Button href="#" bsSize="small" onClick={() => console.log("join")}>Forgot Password?</Button>
+				    <LinkContainer to="/findPassword"><Button bsSize="small">Forgot Password?</Button></LinkContainer>
 				  </ButtonGroup>
 				</Panel>
 			</Col>
