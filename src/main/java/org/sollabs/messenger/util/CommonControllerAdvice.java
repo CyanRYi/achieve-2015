@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class CommonControllerAdvice {
 
 	private static final Logger logger = LoggerFactory.getLogger(CommonControllerAdvice.class);
-	
+
 	@ExceptionHandler(InvalidPasswordException.class)
 	@ResponseStatus(value=HttpStatus.BAD_REQUEST, reason="Invalid Password")
 	public String handleInvalidPasswordException(HttpServletRequest req, Exception ex) {

@@ -48960,7 +48960,6 @@
 	  }, {
 	    key: 'handleSubmit',
 	    value: function handleSubmit() {
-
 	      if (this.state.validationMessage.length > 1) return;
 
 	      var AJAX = new _Ajax2.default();
@@ -48972,6 +48971,13 @@
 	      };
 
 	      AJAX.call('/users/password', 'PUT', this.closeModal, console.log, params);
+	    }
+	  }, {
+	    key: 'handleKeyEvent',
+	    value: function handleKeyEvent(event) {
+	      if (event.key === "Enter") {
+	        this.handleSubmit();
+	      }
 	    }
 	  }, {
 	    key: 'render',
@@ -49035,7 +49041,7 @@
 	                _reactBootstrap.Col,
 	                { sm: 8 },
 	                _react2.default.createElement(_reactBootstrap.FormControl, { id: 'passwordRepeat', type: 'password', placeholder: '\uBE44\uBC00\uBC88\uD638 \uD655\uC778', value: this.state.passwordRepeat,
-	                  onChange: this.handleChange })
+	                  onChange: this.handleChange, onKeyPress: this.handleKeyEvent.bind(this) })
 	              )
 	            ),
 	            _react2.default.createElement(
@@ -49169,6 +49175,13 @@
 				xhr.send("email=" + this.state.email + "&password=" + this.state.password);
 			}
 		}, {
+			key: 'handleKeyEvent',
+			value: function handleKeyEvent(event) {
+				if (event.key === "Enter") {
+					this.handleSubmit();
+				}
+			}
+		}, {
 			key: 'render',
 			value: function render() {
 				return _react2.default.createElement(
@@ -49185,7 +49198,7 @@
 								value: this.state.email, onChange: this.handleChange }),
 							_react2.default.createElement(_reactBootstrap.FormControl, {
 								id: 'password', type: 'password', placeholder: 'Password',
-								value: this.state.password, onChange: this.handleChange })
+								value: this.state.password, onChange: this.handleChange, onKeyPress: this.handleKeyEvent.bind(this) })
 						),
 						_react2.default.createElement(
 							_reactBootstrap.Button,
@@ -49360,6 +49373,13 @@
 				}
 			}
 		}, {
+			key: 'handleKeyEvent',
+			value: function handleKeyEvent(event) {
+				if (event.key === "Enter") {
+					this.handleSubmit();
+				}
+			}
+		}, {
 			key: 'render',
 			value: function render() {
 				return _react2.default.createElement(
@@ -49382,7 +49402,7 @@
 								value: this.state.password, onChange: this.handleChange }),
 							_react2.default.createElement(_reactBootstrap.FormControl, {
 								id: 'passwordRepeat', type: 'password', placeholder: 'Password Repeat',
-								value: this.state.passwordRepeat, onChange: this.handleChange })
+								value: this.state.passwordRepeat, onChange: this.handleChange, onKeyPress: this.handleKeyEvent.bind(this) })
 						),
 						_react2.default.createElement(
 							_reactBootstrap.HelpBlock,

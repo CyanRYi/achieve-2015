@@ -58,6 +58,12 @@ export default class SignIn extends React.Component {
 		xhr.send("email=" + this.state.email + "&password=" + this.state.password);
 	}
 
+	handleKeyEvent(event) {
+    if (event.key === "Enter") {
+        this.handleSubmit();
+    }
+  }
+
 	render() {
 		return (
 			<Col smOffset={3} sm={6}>
@@ -68,7 +74,7 @@ export default class SignIn extends React.Component {
 								value={this.state.email} onChange={this.handleChange} />
 							<FormControl
 								id="password" type="password" placeholder="Password"
-								value={this.state.password} onChange={this.handleChange} />
+								value={this.state.password} onChange={this.handleChange} onKeyPress={this.handleKeyEvent.bind(this)} />
 					</Form>
 					<Button bsStyle="primary" bsSize="large" block onClick={this.handleSubmit}>Sign In</Button>
 					<ButtonGroup justified>

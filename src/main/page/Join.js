@@ -96,6 +96,12 @@ export default class Join extends React.Component {
 		}
 	}
 
+	handleKeyEvent(event) {
+    if (event.key === "Enter") {
+        this.handleSubmit();
+    }
+  }
+
 	render() {
 		return (
 			<Col smOffset={3} sm={6}>
@@ -112,7 +118,7 @@ export default class Join extends React.Component {
 								value={this.state.password} onChange={this.handleChange} />
 							<FormControl
 								id="passwordRepeat" type="password" placeholder="Password Repeat"
-								value={this.state.passwordRepeat} onChange={this.handleChange} />
+								value={this.state.passwordRepeat} onChange={this.handleChange} onKeyPress={this.handleKeyEvent.bind(this)} />
 					</Form>
 					<HelpBlock>{this.state.validationMessage}</HelpBlock>
 					<Button bsStyle="primary" bsSize="large" block onClick={this.handleSubmit}>Sign Up</Button>

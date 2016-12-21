@@ -57,7 +57,5 @@ public class AccountController {
 		accountService.changeUser(account);
 		
 		return new ResponseEntity<>(HttpStatus.OK);
-	}
-	
-	
+	}	
 }

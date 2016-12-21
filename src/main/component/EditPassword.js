@@ -77,7 +77,6 @@ export default class EditPassword extends React.Component {
   }
 
   handleSubmit() {
-
 		if (this.state.validationMessage.length > 1) return;
 
     const AJAX = new Ajax();
@@ -89,6 +88,12 @@ export default class EditPassword extends React.Component {
 		};
 
 		AJAX.call('/users/password', 'PUT', this.closeModal, console.log, params);
+  }
+
+	handleKeyEvent(event) {
+    if (event.key === "Enter") {
+        this.handleSubmit();
+    }
   }
 
 	render() {
@@ -124,7 +129,7 @@ export default class EditPassword extends React.Component {
               </Col>
               <Col sm={8}>
                 <FormControl id="passwordRepeat" type="password" placeholder="비밀번호 확인" value={this.state.passwordRepeat}
-									onChange={this.handleChange} />
+									onChange={this.handleChange}  onKeyPress={this.handleKeyEvent.bind(this)} />
               </Col>
             </FormGroup>
             <Col smOffset={2} sm={10}>
