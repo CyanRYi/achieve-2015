@@ -1,10 +1,10 @@
 package org.sollabs.messenger.websocket;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.transaction.Transactional;
 
@@ -63,7 +63,7 @@ public class WebSocketSessionManager {
 		
 		Room room = roomService.updateLastMessage(msg);
 		
-		List<Account> unConnectedMember = new ArrayList<Account>();
+		Set<Account> unConnectedMember = new HashSet<Account>();
 		
 		for(Account member : room.getMember()) {
 			if (connections.containsKey(member.getId())) {
