@@ -2,7 +2,7 @@
 
 Simple Web Messenger project just to learn.
 
-Demo(0.1) : [demo][link]
+Demo(0.3) : [demo][link]
 [link]: http://52.78.6.211:9000 "Demo Page"
 
 
@@ -19,5 +19,5 @@ Demo(0.1) : [demo][link]
  * reactJS 15.1.0
  * react-router 2.6.1
  * react-bootstrap 0.30.2
- * #webpack 1.13.3
+ * webpack 1.13.3
  * ...
