@@ -12,7 +12,7 @@ public class UserAccount extends User {
 	private final String name;
 	
 	public UserAccount(Account account, Collection<? extends GrantedAuthority> authorities) {
-		super(account.getEmail(), account.getPassword(), true, true, account.getSigninFailureCount() < 50, true, authorities);
+		super(account.getEmail(), account.getPassword(), true, true, account.getSigninFailureCount() < 5, true, authorities);
 		this.userId = account.getId();
 		this.name = account.getName();
 	}

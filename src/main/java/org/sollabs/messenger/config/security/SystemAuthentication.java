@@ -12,12 +12,6 @@ public class SystemAuthentication extends UsernamePasswordAuthenticationToken im
 
 	private String userName;
 
-	public SystemAuthentication(Object principal, Object credentials, long userId, String userName) {
-		super(principal, credentials);
-		this.userId = userId;
-		this.userName = userName;
-	}
-
 	public SystemAuthentication(Object principal, Object credentials,
 			Collection<? extends GrantedAuthority> authorities, long userId, String userName) {
 		super(principal, credentials, authorities);
