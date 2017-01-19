@@ -2,8 +2,7 @@
 
 Simple Web Messenger project just to learn.
 
-Demo(0.3) : [demo][link]
-[link]: http://52.78.6.211:9000 "Demo Page"
+Demo(0.3) : Wait for New Version!
 
 
 * back-end frameworks & libraries
